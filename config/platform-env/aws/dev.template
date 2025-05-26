@@ -1,0 +1,59 @@
+# Environment Configuration Template for AWS Development
+# This file is used to generate .env during --setup
+
+# Application Configuration
+NODE_ENV=development
+PORT=3000
+HOST=0.0.0.0
+
+# Authentication
+AUTH_DISABLED=false
+KEYCLOAK_ENABLED=true
+KEYCLOAK_URL=${KEYCLOAK_URL}
+KEYCLOAK_REALM=${KEYCLOAK_REALM}
+KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
+
+# Database Configuration
+DATABASE_URL=${RDS_DATABASE_URL}
+DATABASE_TYPE=postgresql
+DATABASE_SSL=true
+
+# AWS Configuration
+AWS_REGION=${AWS_REGION}
+AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+AWS_S3_BUCKET=${AWS_S3_BUCKET}
+
+# Logging Configuration
+LOG_LEVEL=info
+LOG_FORMAT=json
+CLOUDWATCH_LOG_GROUP=${CLOUDWATCH_LOG_GROUP}
+
+# API Configuration
+API_PREFIX=/api
+API_VERSION=v1
+
+# LLM Configuration
+LLM_PROVIDER=aws
+LLM_BEDROCK_REGION=${AWS_REGION}
+LLM_MODEL_ID=${LLM_MODEL_ID}
+LLM_CACHE_ENABLED=true
+
+# Security
+CORS_ENABLED=true
+CORS_ORIGIN=${ALLOWED_ORIGINS}
+JWT_SECRET=${JWT_SECRET}
+
+# Monitoring
+HEALTH_CHECK_ENABLED=true
+METRICS_ENABLED=true
+PROMETHEUS_PORT=9090
+
+# File Upload
+UPLOAD_MAX_SIZE=50MB
+UPLOAD_DIR=/tmp/uploads
+
+# Cache Configuration
+REDIS_ENABLED=true
+REDIS_URL=${REDIS_URL}
+CACHE_TTL=3600 

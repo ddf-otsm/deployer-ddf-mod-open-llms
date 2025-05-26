@@ -1,0 +1,147 @@
+# Docker Production Environment Configuration
+# Production-ready Docker settings
+
+environment: "production"
+platform: "docker"
+
+# Inherit from base production config (when created)
+# extends: "prd.yml"
+
+# Docker-specific settings for production
+docker:
+  compose_file: "docker-compose.prod.yml"
+  build_context: "."
+  dockerfile: "Dockerfile"
+  target: "production"
+  
+  # Production container settings
+  containers:
+    ai-testing-agent:
+      image: "deployer-ddf-mod-llm-models:latest"
+      container_name: "deployer-ddf-mod-llm-models-prd"
+      ports:
+        - "3000:3000"
+      restart_policy: "always"
+      
+    ollama:
+      image: "ollama/ollama:latest"
+      container_name: "ollama-server-prd"
+      ports:
+        - "11434:11434"
+      restart_policy: "always"
+      
+    redis:
+      image: "redis:7-alpine"
+      container_name: "redis-cache-prd"
+      ports:
+        - "6379:6379"
+      restart_policy: "always"
+      
+    nginx:
+      image: "nginx:alpine"
+      container_name: "nginx-proxy-prd"
+      ports:
+        - "80:80"
+        - "443:443"
+      restart_policy: "always"
+
+# Application settings
+app:
+  name: "deployer-ddf-mod-llm-models"
+  version: "1.0.0"
+  port: 3000
+  host: "0.0.0.0"
+
+# Authentication settings - ENABLED for production
+auth:
+  enabled: true  # Enable authentication for production
+  method: "keycloak"
+  
+# Environment variables for production Docker containers
+environment_variables:
+  NODE_ENV: "production"
+  AUTH_DISABLED: "false"  # Enable authentication
+  PORT: "3000"
+  LOG_LEVEL: "info"
+  OLLAMA_HOST: "ollama:11434"
+  REDIS_URL: "redis://redis:6379"
+
+# Volume mappings for production
+volumes:
+  logs: "./logs:/app/logs"
+  config: "./config:/app/config:ro"
+  ollama_data: "ollama_data_prd:/root/.ollama"
+  redis_data: "redis_data_prd:/data"
+  nginx_config: "./nginx:/etc/nginx/conf.d:ro"
+  ssl_certs: "./ssl:/etc/ssl/certs:ro"
+
+# Network settings
+networks:
+  ai-testing-network-prd:
+    driver: "bridge"
+    name: "ai-testing-network-prd"
+
+# Health check settings for production
+health_checks:
+  ai-testing-agent:
+    test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+    interval: "15s"  # More frequent checks in production
+    timeout: "5s"
+    retries: 5
+    start_period: "60s"
+    
+  ollama:
+    test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+    interval: "30s"
+    timeout: "10s"
+    retries: 3
+    start_period: "120s"  # Longer start period for model loading
+    
+  redis:
+    test: ["CMD", "redis-cli", "ping"]
+    interval: "15s"
+    timeout: "5s"
+    retries: 3
+    
+  nginx:
+    test: ["CMD", "curl", "-f", "http://localhost/health"]
+    interval: "15s"
+    timeout: "5s"
+    retries: 3
+
+# Logging settings for production Docker
+logging:
+  level: "INFO"
+  console: false
+  file: true
+  docker_logs:
+    enabled: true
+    driver: "json-file"
+    options:
+      max-size: "50m"
+      max-file: "5"
+      
+# Resource limits for production
+resource_limits:
+  ai-testing-agent:
+    memory: "2g"
+    cpus: "1.0"
+  ollama:
+    memory: "4g"
+    cpus: "2.0"
+  redis:
+    memory: "512m"
+    cpus: "0.5"
+  nginx:
+    memory: "256m"
+    cpus: "0.25"
+
+# Security settings
+security:
+  user: "aitest:aitest"
+  read_only: true
+  no_new_privileges: true
+  cap_drop:
+    - "ALL"
+  cap_add:
+    - "NET_BIND_SERVICE" 

@@ -1,3 +1,7 @@
+# Generated docker-compose.yml
+# DO NOT EDIT MANUALLY - Generated from config files
+# To regenerate: bash scripts/generate-docker-compose.sh --env=dev --platform=docker
+
 version: '3.8'
 
 services:
@@ -76,4 +80,7 @@ volumes:
   ollama_data:
     name: ollama_data
   redis_data:
-    name: redis_data 
+    name: redis_data
+
+# Generated on: 2025-05-26T21:53:18Z
+# From config: /Users/luismartins/cursor_local_repos/deployer-ddf-mod-open-llms/config/dev.docker.yml

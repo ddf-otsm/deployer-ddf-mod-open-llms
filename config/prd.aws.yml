@@ -1,0 +1,116 @@
+# AWS Production Environment Configuration
+# Production-ready settings for AWS deployment
+
+environment: "production"
+platform: "aws"
+
+# Inherit from base production config (when created)
+# extends: "prd.yml"
+
+# AWS-specific settings
+aws:
+  region: "us-east-1"
+  account_id: "468720548566"
+  
+  # Production deployment settings
+  deployment:
+    type: "ecs-fargate"
+    cluster_name: "deployer-ddf-mod-llm-models-prd"
+    service_name: "ai-testing-agent-prd"
+    
+  # Production resource settings
+  resources:
+    cpu: 2048      # 2 vCPU
+    memory: 4096   # 4 GB
+    desired_count: 2  # Multiple instances for HA
+    
+  # Production optimizations
+  cost_optimization:
+    auto_stop: false  # Keep running in production
+    spot_instances: false  # Use regular instances for stability
+    
+  # Production security settings
+  security:
+    vpc_id: ""  # Should be specified for production
+    subnet_ids: []  # Should be specified for production
+    security_group_ids: []  # Should be specified for production
+    
+# Application settings
+app:
+  name: "deployer-ddf-mod-llm-models"
+  version: "1.0.0"
+  port: 3000
+  host: "0.0.0.0"
+
+# Authentication settings - ENABLED for production
+auth:
+  enabled: true  # Enable authentication for production
+  method: "keycloak"
+  
+  # Keycloak settings (must be configured)
+  keycloak:
+    enabled: true
+    server_url: "${KEYCLOAK_SERVER_URL}"
+    realm: "${KEYCLOAK_REALM}"
+    client_id: "${KEYCLOAK_CLIENT_ID}"
+    client_secret: "${KEYCLOAK_CLIENT_SECRET}"
+    
+  # API key fallback
+  api_key:
+    enabled: true
+    header_name: "X-API-Key"
+    
+# Logging settings for production
+logging:
+  level: "INFO"  # Less verbose for production
+  console: false
+  file: false
+  cloudwatch:
+    enabled: true
+    log_group: "/ecs/deployer-ddf-mod-llm-models-prd"
+    retention_days: 30
+
+# Health check settings
+health_check:
+  path: "/health"
+  interval: 30
+  timeout: 5
+  healthy_threshold: 2
+  unhealthy_threshold: 5
+
+# Load balancer settings
+load_balancer:
+  enabled: true
+  type: "application"
+  scheme: "internet-facing"
+  health_check_path: "/health"
+  ssl_certificate_arn: "${SSL_CERTIFICATE_ARN}"
+
+# Auto-scaling settings
+auto_scaling:
+  enabled: true
+  min_capacity: 2
+  max_capacity: 10
+  target_cpu_utilization: 70
+  target_memory_utilization: 80
+
+# Monitoring and alerting
+monitoring:
+  cloudwatch:
+    enabled: true
+    metrics:
+      - "CPUUtilization"
+      - "MemoryUtilization"
+      - "RequestCount"
+      - "ResponseTime"
+  
+  alerts:
+    high_cpu:
+      threshold: 80
+      period: 300
+    high_memory:
+      threshold: 85
+      period: 300
+    error_rate:
+      threshold: 5
+      period: 300 

@@ -1,0 +1,51 @@
+# Environment Configuration Template for Cursor Development
+# This file is used to generate .env during --setup
+
+# Application Configuration
+NODE_ENV=development
+PORT=3000
+HOST=localhost
+
+# Authentication (disabled for development)
+AUTH_DISABLED=true
+KEYCLOAK_ENABLED=false
+
+# Database Configuration
+DATABASE_URL=sqlite:./dev.db
+DATABASE_TYPE=sqlite
+
+# Logging Configuration
+LOG_LEVEL=debug
+LOG_FORMAT=pretty
+
+# API Configuration
+API_PREFIX=/api
+API_VERSION=v1
+
+# Development Features
+HOT_RELOAD=true
+DEBUG_MODE=true
+VERBOSE_LOGGING=true
+
+# LLM Configuration
+LLM_PROVIDER=local
+LLM_MODEL_PATH=./models
+LLM_CACHE_ENABLED=true
+
+# Security (development only)
+CORS_ENABLED=true
+CORS_ORIGIN=*
+JWT_SECRET=dev-secret-key-change-in-production
+
+# Monitoring
+HEALTH_CHECK_ENABLED=true
+METRICS_ENABLED=true
+PROMETHEUS_PORT=9090
+
+# File Upload
+UPLOAD_MAX_SIZE=10MB
+UPLOAD_DIR=./uploads
+
+# Cache Configuration
+REDIS_ENABLED=false
+CACHE_TTL=3600 
