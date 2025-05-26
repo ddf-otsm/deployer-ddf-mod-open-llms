@@ -10,11 +10,51 @@ config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Development mode - bypass authentication
+const DEVELOPMENT_MODE = process.env.NODE_ENV === 'development' || process.env.AUTH_DISABLED === 'true';
+
 // Security middleware
 app.use(helmet());
 app.use(cors());
 app.use(compression());
 app.use(express.json());
+
+// Simple authentication middleware (can be bypassed in development)
+const authMiddleware = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (DEVELOPMENT_MODE) {
+    // In development mode, bypass authentication
+    console.log('🔓 Development mode: Authentication bypassed');
+    return next();
+  }
+  
+  // In production, check for API key or token
+  const apiKey = req.headers['x-api-key'] || req.query.api_key;
+  const authHeader = req.headers.authorization;
+  
+  if (!apiKey && !authHeader) {
+    return res.status(401).json({ 
+      error: 'Authentication required',
+      message: 'Please provide an API key or authorization token'
+    });
+  }
+  
+  // Simple API key validation (replace with proper validation)
+  if (apiKey && apiKey === process.env.API_KEY) {
+    return next();
+  }
+  
+  // Bearer token validation (placeholder)
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    // In a real implementation, validate the JWT token here
+    console.log('🔑 Token authentication (placeholder)');
+    return next();
+  }
+  
+  return res.status(401).json({ 
+    error: 'Invalid authentication',
+    message: 'Invalid API key or token'
+  });
+};
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -36,8 +76,8 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-// Test generation endpoint (placeholder)
-app.post('/api/generate-tests', (req, res): void => {
+// Test generation endpoint (placeholder) - protected by auth
+app.post('/api/generate-tests', authMiddleware, (req, res): void => {
   const { code, language = 'typescript' } = req.body;
   
   if (!code) {
@@ -64,8 +104,28 @@ app.post('/api/generate-tests', (req, res): void => {
 });
 
 // Error handling middleware
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction): void => {
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Error:', err);
+  
+  // Handle JSON parsing errors
+  if (err.type === 'entity.parse.failed') {
+    res.status(400).json({
+      error: 'Invalid JSON',
+      message: 'Request body contains invalid JSON'
+    });
+    return;
+  }
+  
+  // Handle other client errors
+  if (err.status && err.status >= 400 && err.status < 500) {
+    res.status(err.status).json({
+      error: 'Client error',
+      message: err.message || 'Bad request'
+    });
+    return;
+  }
+  
+  // Handle server errors
   res.status(500).json({
     error: 'Internal server error',
     message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'

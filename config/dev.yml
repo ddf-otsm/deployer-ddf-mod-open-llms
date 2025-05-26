@@ -1,0 +1,71 @@
+# Development Environment Configuration
+# Basic config for local development without Keycloak
+
+environment: "development"
+platform: "cursor"
+
+# Application settings
+app:
+  name: "deployer-ddf-mod-llm-models"
+  version: "1.0.0"
+  port: 3000
+  host: "localhost"
+
+# Authentication settings - DISABLED for development
+auth:
+  enabled: false  # Disable authentication for development
+  method: "none"  # No authentication required
+  
+  # Keycloak settings (disabled)
+  keycloak:
+    enabled: false
+    server_url: ""
+    realm: ""
+    client_id: ""
+    
+  # API key fallback (optional)
+  api_key:
+    enabled: false
+    header_name: "X-API-Key"
+
+# Database/Storage settings
+storage:
+  type: "memory"  # Use in-memory storage for development
+  
+# Logging settings
+logging:
+  level: "DEBUG"
+  console: true
+  file: true
+  structured: true
+
+# Development features
+development:
+  hot_reload: true
+  debug_mode: true
+  cors_enabled: true
+  detailed_errors: true
+
+# LLM settings
+llm:
+  provider: "ollama"
+  models:
+    - "deepseek-coder:1.3b"
+    - "deepseek-coder:6.7b"
+  endpoint: "http://localhost:11434"
+
+# Testing settings
+testing:
+  framework: "vitest"
+  coverage: true
+  mutation_testing: false  # Disable for faster development
+
+# Security settings (relaxed for development)
+security:
+  cors:
+    enabled: true
+    origins: ["http://localhost:3000", "http://localhost:3001"]
+  helmet:
+    enabled: true
+  rate_limiting:
+    enabled: false 

@@ -1,0 +1,73 @@
+# AWS Development Environment Configuration
+# Extends dev.yml with AWS-specific settings
+
+environment: "development"
+platform: "aws"
+
+# Inherit from base dev config
+extends: "dev.yml"
+
+# AWS-specific settings
+aws:
+  region: "us-east-1"
+  account_id: "468720548566"  # From the test output
+  
+  # Deployment settings
+  deployment:
+    type: "ecs-fargate"
+    cluster_name: "deployer-ddf-mod-llm-models-dev"
+    service_name: "ai-testing-agent-dev"
+    
+  # Resource settings for development
+  resources:
+    cpu: 1024      # 1 vCPU
+    memory: 2048   # 2 GB
+    desired_count: 1  # Single instance for dev
+    
+  # Cost optimization for development
+  cost_optimization:
+    auto_stop: true
+    spot_instances: false  # Use regular instances for stability
+    
+  # Security settings
+  security:
+    vpc_id: ""  # Will be created if empty
+    subnet_ids: []  # Will use default subnets
+    security_group_ids: []  # Will create default security group
+    
+# Application settings (override from base)
+app:
+  name: "deployer-ddf-mod-llm-models"
+  version: "1.0.0"
+  port: 3000
+  host: "0.0.0.0"  # Listen on all interfaces for AWS
+
+# Authentication settings - DISABLED for development
+auth:
+  enabled: false  # Keep authentication disabled for development
+  method: "none"
+  
+# Logging settings for AWS
+logging:
+  level: "INFO"  # Less verbose for AWS
+  console: true
+  file: false  # Use CloudWatch instead
+  cloudwatch:
+    enabled: true
+    log_group: "/ecs/deployer-ddf-mod-llm-models-dev"
+    retention_days: 7
+
+# Health check settings
+health_check:
+  path: "/health"
+  interval: 30
+  timeout: 5
+  healthy_threshold: 2
+  unhealthy_threshold: 3
+
+# Load balancer settings
+load_balancer:
+  enabled: true
+  type: "application"
+  scheme: "internet-facing"
+  health_check_path: "/health" 

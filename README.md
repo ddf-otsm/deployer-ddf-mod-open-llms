@@ -13,19 +13,48 @@ An intelligent testing agent that uses open source Large Language Models to auto
 
 ## 🏃 Quick Start
 
+### Option 1: Local Development (Recommended)
 ```bash
 # Clone the repository
 git clone https://github.com/ddf-otsm/deployer-ddf-mod-open-llms.git
 cd deployer-ddf-mod-open-llms
 
-# Install dependencies
-npm install
+# Quick start with authentication bypass
+NODE_ENV=development AUTH_DISABLED=true ./run.sh --env=dev --platform=cursor --fast
 
-# Start with Docker
+# Or use the central run script
+./run.sh --env=dev --platform=cursor --fast
+```
+
+### Option 2: Docker Deployment
+```bash
+# Start with Docker (includes Ollama and Redis)
+./run.sh --env=dev --platform=docker
+
+# Or manually with docker-compose
 docker-compose up -d
+```
 
-# Run AI test generation
-npm run ai:test:smart
+### Option 3: AWS Deployment
+```bash
+# Test AWS availability first
+bash scripts/test-aws-availability.sh
+
+# Deploy to AWS
+./run.sh --env=dev --platform=aws --setup --verbose
+```
+
+### 🧪 Test the Service
+```bash
+# Run comprehensive test suite
+bash scripts/quick-test.sh
+
+# Test individual endpoints
+curl http://localhost:3000/health
+curl http://localhost:3000/api/status
+curl -X POST http://localhost:3000/api/generate-tests \
+  -H "Content-Type: application/json" \
+  -d '{"code":"function add(a, b) { return a + b; }", "language":"javascript"}'
 ```
 
 ## 📚 Documentation
