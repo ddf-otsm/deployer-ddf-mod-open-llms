@@ -1,0 +1,73 @@
+{
+  "name": "deployer-ddf-mod-llm-models",
+  "version": "1.0.0",
+  "description": "Self-hosted AI testing agent using Ollama + DeepSeek-Coder for intelligent test generation",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "test:mutation": "stryker run",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write src/**/*.ts",
+    "docker:build": "docker build -t deployer-ddf-mod-llm-models .",
+    "docker:run": "docker run -p 3000:3000 deployer-ddf-mod-llm-models",
+    "deploy:aws": "./scripts/deploy/aws-deploy.sh",
+    "health:check": "./scripts/deploy/health-check.sh",
+    "security:check": "./scripts/security-check.sh"
+  },
+  "keywords": [
+    "ai",
+    "testing",
+    "ollama",
+    "deepseek",
+    "llm",
+    "test-generation",
+    "mutation-testing",
+    "self-hosted"
+  ],
+  "author": "AI Testing Agent Team",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^20.0.0",
+    "axios": "^1.6.0",
+    "express": "^4.18.0",
+    "winston": "^3.11.0",
+    "dotenv": "^16.3.0",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.0",
+    "@types/cors": "^2.8.0",
+    "@types/compression": "^1.7.0",
+    "@stryker-mutator/core": "^8.0.0",
+    "@stryker-mutator/vitest-runner": "^8.0.0",
+    "@stryker-mutator/typescript-checker": "^8.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "eslint": "^8.57.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "prettier": "^3.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ddf-otsm/deployer-ddf-mod-open-llms.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ddf-otsm/deployer-ddf-mod-open-llms/issues"
+  },
+  "homepage": "https://github.com/ddf-otsm/deployer-ddf-mod-open-llms"
+}

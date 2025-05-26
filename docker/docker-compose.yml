@@ -1,0 +1,128 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ai-testing-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - ai-testing-network
+    labels:
+      - "project=deployer-ddf-mod-llm-models"
+      - "component=llm-inference"
+      - "auto-stop=enabled"
+
+  ai-test-generator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-testing-generator
+    depends_on:
+      ollama:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    volumes:
+      - ../src:/app/src:ro
+      - ../config:/app/config:ro
+      - test_results:/app/results
+      - ./logs:/app/logs
+    environment:
+      - OLLAMA_HOST=ollama:11434
+      - PYTHONPATH=/app/src
+      - LOG_LEVEL=INFO
+      - MODEL_CACHE_DIR=/app/models
+      - ENVIRONMENT=development
+      - FLASK_ENV=development
+    working_dir: /app
+    command: ["python", "src/auth_middleware.py"]
+    restart: unless-stopped
+    networks:
+      - ai-testing-network
+    labels:
+      - "project=deployer-ddf-mod-llm-models"
+      - "component=test-generator"
+      - "auto-stop=enabled"
+
+  model-downloader:
+    image: ollama/ollama:latest
+    container_name: ai-testing-model-downloader
+    depends_on:
+      ollama:
+        condition: service_healthy
+    volumes:
+      - ollama_models:/root/.ollama
+    environment:
+      - OLLAMA_HOST=ollama:11434
+    command: >
+      sh -c "
+        echo 'Downloading AI models...' &&
+        ollama pull deepseek-coder:1.3b &&
+        ollama pull deepseek-coder:6.7b &&
+        ollama pull llama3.2:1b &&
+        echo 'Model download complete!'
+      "
+    networks:
+      - ai-testing-network
+    labels:
+      - "project=deployer-ddf-mod-llm-models"
+      - "component=model-downloader"
+      - "auto-stop=enabled"
+
+  monitoring:
+    image: prom/prometheus:latest
+    container_name: ai-testing-monitoring
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=7d'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - ai-testing-network
+    labels:
+      - "project=deployer-ddf-mod-llm-models"
+      - "component=monitoring"
+
+volumes:
+  ollama_models:
+    driver: local
+    labels:
+      - "project=deployer-ddf-mod-llm-models"
+      - "component=model-storage"
+  
+  test_results:
+    driver: local
+    labels:
+      - "project=deployer-ddf-mod-llm-models"
+      - "component=test-results"
+  
+  prometheus_data:
+    driver: local
+    labels:
+      - "project=deployer-ddf-mod-llm-models"
+      - "component=monitoring-data"
+
+networks:
+  ai-testing-network:
+    driver: bridge
+    labels:
+      - "project=deployer-ddf-mod-llm-models"
+      - "component=network" 

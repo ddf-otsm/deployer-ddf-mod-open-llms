@@ -1,0 +1,210 @@
+# Authentication Configuration Template
+# Copy this file to auth-config.yml and replace all REPLACE_WITH_* placeholders
+
+# Authentication providers configuration
+auth_providers:
+  # Primary authentication method
+  primary:
+    type: "keycloak"  # or "oauth2", "jwt", "basic"
+    enabled: true
+    
+    # Keycloak configuration
+    keycloak:
+      server_url: "REPLACE_WITH_KEYCLOAK_SERVER_URL"  # e.g., https://auth.yourdomain.com
+      realm: "REPLACE_WITH_KEYCLOAK_REALM"  # e.g., dadosfera
+      client_id: "REPLACE_WITH_CLIENT_ID"
+      client_secret: "REPLACE_WITH_CLIENT_SECRET"  # Store in secrets/
+      
+      # Token validation settings
+      token_validation:
+        verify_signature: true
+        verify_audience: true
+        verify_issuer: true
+        leeway: 30  # seconds
+        
+      # User mapping
+      user_mapping:
+        username_claim: "preferred_username"
+        email_claim: "email"
+        roles_claim: "realm_access.roles"
+        
+  # Fallback authentication (optional)
+  fallback:
+    type: "api_key"
+    enabled: true
+    
+    # API Key configuration
+    api_key:
+      header_name: "X-API-Key"
+      query_param: "api_key"  # Alternative to header
+      
+      # Key validation
+      validation:
+        min_length: 32
+        algorithm: "sha256"
+        
+# Session management
+session:
+  # Session storage
+  storage:
+    type: "redis"  # or "memory", "database"
+    
+    # Redis configuration (if using redis)
+    redis:
+      host: "REPLACE_WITH_REDIS_HOST"  # e.g., localhost, redis.yourdomain.com
+      port: 6379
+      password: "REPLACE_WITH_REDIS_PASSWORD"  # Store in secrets/
+      database: 0
+      
+  # Session settings
+  settings:
+    timeout: 3600  # 1 hour in seconds
+    refresh_threshold: 300  # Refresh if less than 5 minutes remaining
+    max_concurrent_sessions: 5
+    
+# Authorization configuration
+authorization:
+  # Role-based access control
+  rbac:
+    enabled: true
+    
+    # Default roles
+    roles:
+      admin:
+        permissions:
+          - "llm:*"
+          - "config:*"
+          - "users:*"
+          - "monitoring:*"
+          
+      user:
+        permissions:
+          - "llm:query"
+          - "llm:status"
+          - "monitoring:read"
+          
+      readonly:
+        permissions:
+          - "llm:status"
+          - "monitoring:read"
+          
+  # Resource-based permissions
+  resources:
+    llm_models:
+      access_control: "role_based"
+      default_permission: "deny"
+      
+    api_endpoints:
+      rate_limiting: true
+      max_requests_per_minute: 60
+      
+# Security settings
+security:
+  # Password requirements (if using local auth)
+  password_policy:
+    min_length: 12
+    require_uppercase: true
+    require_lowercase: true
+    require_numbers: true
+    require_special_chars: true
+    
+  # Token security
+  tokens:
+    # JWT settings
+    jwt:
+      algorithm: "RS256"
+      issuer: "REPLACE_WITH_JWT_ISSUER"  # e.g., deployer-ddf-mod-llm-models
+      audience: "REPLACE_WITH_JWT_AUDIENCE"
+      expiration: 3600  # 1 hour
+      
+    # API key settings
+    api_keys:
+      rotation_interval: 2592000  # 30 days
+      max_age: 7776000  # 90 days
+      
+  # Rate limiting
+  rate_limiting:
+    enabled: true
+    
+    # Global limits
+    global:
+      requests_per_minute: 1000
+      requests_per_hour: 10000
+      
+    # Per-user limits
+    per_user:
+      requests_per_minute: 100
+      requests_per_hour: 1000
+      
+# Audit logging
+audit:
+  enabled: true
+  
+  # Events to log
+  events:
+    - "authentication_success"
+    - "authentication_failure"
+    - "authorization_failure"
+    - "token_refresh"
+    - "session_timeout"
+    - "api_key_usage"
+    
+  # Log storage
+  storage:
+    type: "cloudwatch"  # or "file", "database"
+    retention_days: 90
+    
+# Environment-specific settings
+environment:
+  development:
+    # More lenient settings for development
+    session_timeout: 7200  # 2 hours
+    rate_limiting_enabled: false
+    audit_level: "basic"
+    
+  production:
+    # Strict settings for production
+    session_timeout: 1800  # 30 minutes
+    rate_limiting_enabled: true
+    audit_level: "detailed"
+    mfa_required: true
+    
+# Integration settings
+integrations:
+  # External identity providers
+  external_providers:
+    google:
+      enabled: false
+      client_id: "REPLACE_WITH_GOOGLE_CLIENT_ID"
+      client_secret: "REPLACE_WITH_GOOGLE_CLIENT_SECRET"  # Store in secrets/
+      
+    microsoft:
+      enabled: false
+      client_id: "REPLACE_WITH_MICROSOFT_CLIENT_ID"
+      client_secret: "REPLACE_WITH_MICROSOFT_CLIENT_SECRET"  # Store in secrets/
+      
+  # Monitoring integration
+  monitoring:
+    prometheus_metrics: true
+    health_check_endpoint: "/auth/health"
+    
+# Notification settings
+notifications:
+  # Security alerts
+  security_alerts:
+    enabled: true
+    email: "REPLACE_WITH_SECURITY_EMAIL"
+    
+    # Alert conditions
+    conditions:
+      - "multiple_failed_logins"
+      - "suspicious_activity"
+      - "token_abuse"
+      
+# Configuration notes
+notes:
+  - "This is an authentication configuration template"
+  - "Replace all REPLACE_WITH_* placeholders with actual values"
+  - "Store sensitive values (passwords, secrets) in the secrets/ directory"
+  - "Review security settings before deploying to production"
+  - "Enable MFA for production environments" 

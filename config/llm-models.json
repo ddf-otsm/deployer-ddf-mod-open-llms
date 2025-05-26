@@ -1,0 +1,327 @@
+{
+  "$schema": "./schemas/llm-models-schema.json",
+  "version": "1.0.0",
+  "metadata": {
+    "description": "LLM Models Configuration for DeployerDDF Platform",
+    "created": "2025-01-22",
+    "lastModified": "2025-01-22",
+    "maintainer": "deployer-ddf-team"
+  },
+  "deployer_ddf": {
+    "module_name": "llm-models",
+    "version": "2.0.0",
+    "platform": {
+      "type": "multi-cloud",
+      "supported_providers": ["aws", "azure", "gcp", "local"],
+      "default_provider": "aws"
+    },
+    "infrastructure": {
+      "networking": {
+        "vpc_cidr": "10.0.0.0/16",
+        "subnets": {
+          "public": ["10.0.1.0/24", "10.0.2.0/24"],
+          "private": ["10.0.3.0/24", "10.0.4.0/24"]
+        }
+      },
+      "security": {
+        "encryption_at_rest": true,
+        "encryption_in_transit": true,
+        "iam_roles": {
+          "execution_role": "deployer-ddf-llm-execution",
+          "task_role": "deployer-ddf-llm-task"
+        }
+      },
+      "monitoring": {
+        "cloudwatch_enabled": true,
+        "log_retention_days": 30,
+        "metrics_enabled": true
+      }
+    },
+    "testing": {
+      "framework": "layered-testing",
+      "pre_prompt_enabled": true,
+      "role_assignment": true,
+      "assistant_mode": true
+    }
+  },
+  "models": {
+    "llama-3.1-8b": {
+      "name": "Llama 3.1 8B",
+      "provider": "meta",
+      "type": "open-source",
+      "version": "3.1",
+      "parameters": "8B",
+      "deployment": {
+        "container_image": "ollama/llama3.1:8b",
+        "memory_requirements": "16GB",
+        "cpu_requirements": "4 vCPU",
+        "gpu_requirements": "optional",
+        "storage_requirements": "20GB"
+      },
+      "endpoints": {
+        "inference": "/api/generate",
+        "health": "/api/tags",
+        "metrics": "/api/metrics"
+      },
+      "testing": {
+        "layer": 1,
+        "standard_questions": [
+          "What is artificial intelligence?",
+          "Explain machine learning in simple terms",
+          "Write a Python function to calculate fibonacci numbers"
+        ],
+        "role_tests": [
+          "assistant",
+          "code_reviewer",
+          "technical_writer"
+        ]
+      }
+    },
+    "llama-3.1-70b": {
+      "name": "Llama 3.1 70B",
+      "provider": "meta",
+      "type": "open-source",
+      "version": "3.1",
+      "parameters": "70B",
+      "deployment": {
+        "aws_bedrock": {
+          "model_id": "meta.llama3-1-70b-instruct-v1:0",
+          "region": "us-east-1",
+          "memory_requirements": "128GB",
+          "cpu_requirements": "16 vCPU"
+        },
+        "local": {
+          "container_image": "ollama/llama3.1:70b",
+          "memory_requirements": "128GB",
+          "storage_requirements": "150GB"
+        }
+      },
+      "endpoints": {
+        "aws": {
+          "inference": "https://bedrock-runtime.us-east-1.amazonaws.com/model/meta.llama3-1-70b-instruct-v1:0/invoke",
+          "health": "https://bedrock.us-east-1.amazonaws.com/foundation-models/meta.llama3-1-70b-instruct-v1:0"
+        },
+        "local": {
+          "inference": "/api/generate",
+          "health": "/api/tags",
+          "metrics": "/api/metrics"
+        }
+      },
+      "testing": {
+        "layer": 2,
+        "standard_questions": [
+          "Explain quantum computing and its applications",
+          "Design a microservices architecture for an e-commerce platform",
+          "Write a comprehensive test suite for a REST API"
+        ],
+        "role_tests": [
+          "senior_engineer",
+          "architect",
+          "technical_lead"
+        ]
+      }
+    },
+    "codellama-34b": {
+      "name": "Code Llama 34B",
+      "provider": "meta",
+      "type": "open-source",
+      "version": "1.0",
+      "parameters": "34B",
+      "specialization": "code_generation",
+      "deployment": {
+        "aws_bedrock": {
+          "model_id": "meta.codellama-34b-instruct-v1:0",
+          "region": "us-east-1",
+          "memory_requirements": "64GB",
+          "cpu_requirements": "8 vCPU"
+        },
+        "local": {
+          "container_image": "ollama/codellama:34b",
+          "memory_requirements": "64GB",
+          "storage_requirements": "80GB"
+        }
+      },
+      "endpoints": {
+        "aws": {
+          "inference": "https://bedrock-runtime.us-east-1.amazonaws.com/model/meta.codellama-34b-instruct-v1:0/invoke",
+          "health": "https://bedrock.us-east-1.amazonaws.com/foundation-models/meta.codellama-34b-instruct-v1:0"
+        },
+        "local": {
+          "inference": "/api/generate",
+          "health": "/api/tags",
+          "metrics": "/api/metrics"
+        }
+      },
+      "testing": {
+        "layer": 2,
+        "standard_questions": [
+          "Generate a React component with TypeScript",
+          "Create a Python class for database operations",
+          "Write unit tests for a JavaScript function"
+        ],
+        "role_tests": [
+          "code_generator",
+          "code_reviewer",
+          "test_writer"
+        ]
+      }
+    },
+    "mistral-7b": {
+      "name": "Mistral 7B",
+      "provider": "mistral",
+      "type": "open-source",
+      "version": "0.1",
+      "parameters": "7B",
+      "deployment": {
+        "container_image": "ollama/mistral:7b",
+        "memory_requirements": "12GB",
+        "cpu_requirements": "4 vCPU",
+        "gpu_requirements": "optional",
+        "storage_requirements": "15GB"
+      },
+      "endpoints": {
+        "inference": "/api/generate",
+        "health": "/api/tags",
+        "metrics": "/api/metrics"
+      },
+      "testing": {
+        "layer": 1,
+        "standard_questions": [
+          "Summarize the key concepts of cloud computing",
+          "Explain the difference between SQL and NoSQL databases",
+          "Write a bash script to backup files"
+        ],
+        "role_tests": [
+          "assistant",
+          "summarizer",
+          "technical_writer"
+        ]
+      }
+    },
+    "llama-4": {
+      "name": "Llama 4",
+      "provider": "meta",
+      "type": "open-source",
+      "version": "4.0",
+      "parameters": "405B",
+      "status": "upcoming",
+      "deployment": {
+        "container_image": "ollama/llama4:latest",
+        "memory_requirements": "512GB",
+        "cpu_requirements": "32 vCPU",
+        "gpu_requirements": "required",
+        "storage_requirements": "1TB"
+      },
+      "endpoints": {
+        "inference": "/api/generate",
+        "health": "/api/tags",
+        "metrics": "/api/metrics"
+      },
+      "testing": {
+        "layer": 4,
+        "standard_questions": [
+          "Design a complete enterprise software architecture",
+          "Analyze and optimize a complex distributed system",
+          "Create a comprehensive AI strategy for a Fortune 500 company"
+        ],
+        "role_tests": [
+          "enterprise_architect",
+          "ai_strategist",
+          "system_optimizer",
+          "technical_advisor"
+        ]
+      }
+    }
+  },
+  "testing_layers": {
+    "layer_1": {
+      "name": "Basic Assistant",
+      "description": "Entry-level models for basic assistance tasks",
+      "models": ["llama-3.1-8b", "mistral-7b"],
+      "pre_prompt_template": "basic_assistant",
+      "complexity": "low",
+      "expected_capabilities": [
+        "simple_qa",
+        "basic_code_generation",
+        "text_summarization"
+      ]
+    },
+    "layer_2": {
+      "name": "Advanced Assistant",
+      "description": "Mid-tier models for complex reasoning and specialized tasks",
+      "models": ["llama-3.1-70b", "codellama-34b"],
+      "pre_prompt_template": "advanced_assistant",
+      "complexity": "medium",
+      "expected_capabilities": [
+        "complex_reasoning",
+        "advanced_code_generation",
+        "technical_documentation",
+        "system_design"
+      ]
+    },
+    "layer_3": {
+      "name": "Expert Assistant",
+      "description": "High-tier models for expert-level tasks",
+      "models": [],
+      "pre_prompt_template": "expert_assistant",
+      "complexity": "high",
+      "expected_capabilities": [
+        "expert_analysis",
+        "architectural_design",
+        "strategic_planning"
+      ]
+    },
+    "layer_4": {
+      "name": "Enterprise Assistant",
+      "description": "Top-tier models for enterprise-level strategic tasks",
+      "models": ["llama-4"],
+      "pre_prompt_template": "enterprise_assistant",
+      "complexity": "enterprise",
+      "expected_capabilities": [
+        "enterprise_architecture",
+        "strategic_consulting",
+        "complex_system_optimization",
+        "ai_strategy_development"
+      ]
+    }
+  },
+  "environments": {
+    "dev": {
+      "enabled_models": ["llama-3.1-8b", "mistral-7b"],
+      "auto_stop": true,
+      "cost_budget": 50,
+      "instance_limits": {
+        "max_instances": 2,
+        "max_memory": "32GB"
+      },
+      "endpoints": {
+        "local": "http://localhost:11434",
+        "aws": "https://bedrock-runtime.us-east-1.amazonaws.com"
+      },
+      "provider_priority": ["local", "aws"]
+    },
+    "staging": {
+      "enabled_models": ["llama-3.1-8b", "llama-3.1-70b", "codellama-34b"],
+      "auto_stop": true,
+      "cost_budget": 150,
+      "instance_limits": {
+        "max_instances": 5,
+        "max_memory": "256GB"
+      },
+      "endpoints": {
+        "local": "http://localhost:11434",
+        "aws": "https://bedrock-runtime.us-east-1.amazonaws.com"
+      },
+      "provider_priority": ["aws", "local"]
+    },
+    "prod": {
+      "enabled_models": ["llama-3.1-70b", "codellama-34b", "llama-4"],
+      "auto_stop": false,
+      "cost_budget": 500,
+      "instance_limits": {
+        "max_instances": 20,
+        "max_memory": "2TB"
+      }
+    }
+  }
+} 

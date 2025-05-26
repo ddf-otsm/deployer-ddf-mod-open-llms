@@ -1,0 +1,382 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://deployer-ddf.com/schemas/llm-models-schema.json",
+  "title": "LLM Models Configuration Schema",
+  "description": "Schema for validating LLM models configuration in DeployerDDF platform",
+  "type": "object",
+  "required": ["version", "metadata", "deployer_ddf", "models", "testing_layers", "environments"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version following semantic versioning"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["description", "created", "lastModified", "maintainer"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Configuration description"
+        },
+        "created": {
+          "type": "string",
+          "format": "date",
+          "description": "Creation date"
+        },
+        "lastModified": {
+          "type": "string",
+          "format": "date",
+          "description": "Last modification date"
+        },
+        "maintainer": {
+          "type": "string",
+          "description": "Configuration maintainer"
+        }
+      }
+    },
+    "deployer_ddf": {
+      "type": "object",
+      "required": ["module_name", "version", "platform", "infrastructure", "testing"],
+      "properties": {
+        "module_name": {
+          "type": "string",
+          "description": "DeployerDDF module name"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Module version"
+        },
+        "platform": {
+          "type": "object",
+          "required": ["type", "supported_providers", "default_provider"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["multi-cloud", "single-cloud", "hybrid"],
+              "description": "Platform deployment type"
+            },
+            "supported_providers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["aws", "azure", "gcp", "local", "kubernetes"]
+              },
+              "description": "Supported cloud providers"
+            },
+            "default_provider": {
+              "type": "string",
+              "enum": ["aws", "azure", "gcp", "local", "kubernetes"],
+              "description": "Default cloud provider"
+            }
+          }
+        },
+        "infrastructure": {
+          "type": "object",
+          "required": ["networking", "security", "monitoring"],
+          "properties": {
+            "networking": {
+              "type": "object",
+              "properties": {
+                "vpc_cidr": {
+                  "type": "string",
+                  "pattern": "^\\d+\\.\\d+\\.\\d+\\.\\d+/\\d+$",
+                  "description": "VPC CIDR block"
+                },
+                "subnets": {
+                  "type": "object",
+                  "properties": {
+                    "public": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^\\d+\\.\\d+\\.\\d+\\.\\d+/\\d+$"
+                      }
+                    },
+                    "private": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^\\d+\\.\\d+\\.\\d+\\.\\d+/\\d+$"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "security": {
+              "type": "object",
+              "properties": {
+                "encryption_at_rest": {
+                  "type": "boolean"
+                },
+                "encryption_in_transit": {
+                  "type": "boolean"
+                },
+                "iam_roles": {
+                  "type": "object",
+                  "properties": {
+                    "execution_role": {
+                      "type": "string"
+                    },
+                    "task_role": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "monitoring": {
+              "type": "object",
+              "properties": {
+                "cloudwatch_enabled": {
+                  "type": "boolean"
+                },
+                "log_retention_days": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 365
+                },
+                "metrics_enabled": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "testing": {
+          "type": "object",
+          "required": ["framework", "pre_prompt_enabled", "role_assignment", "assistant_mode"],
+          "properties": {
+            "framework": {
+              "type": "string",
+              "enum": ["layered-testing", "standard-testing", "custom"]
+            },
+            "pre_prompt_enabled": {
+              "type": "boolean"
+            },
+            "role_assignment": {
+              "type": "boolean"
+            },
+            "assistant_mode": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "models": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z0-9-_.]+$": {
+          "type": "object",
+          "required": ["name", "provider", "type", "version", "deployment", "endpoints", "testing"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Human-readable model name"
+            },
+            "provider": {
+              "type": "string",
+              "enum": ["meta", "openai", "anthropic", "mistral", "google", "huggingface", "custom"],
+              "description": "Model provider"
+            },
+            "type": {
+              "type": "string",
+              "enum": ["open-source", "proprietary", "custom"],
+              "description": "Model type"
+            },
+            "version": {
+              "type": "string",
+              "description": "Model version"
+            },
+            "parameters": {
+              "type": "string",
+              "pattern": "^\\d+[BMK]?$",
+              "description": "Model parameters (e.g., 7B, 70B)"
+            },
+            "specialization": {
+              "type": "string",
+              "enum": ["general", "code_generation", "text_generation", "chat", "embedding"],
+              "description": "Model specialization"
+            },
+            "status": {
+              "type": "string",
+              "enum": ["stable", "beta", "alpha", "upcoming", "deprecated"],
+              "description": "Model status"
+            },
+            "deployment": {
+              "type": "object",
+              "required": ["container_image", "memory_requirements", "cpu_requirements", "storage_requirements"],
+              "properties": {
+                "container_image": {
+                  "type": "string",
+                  "description": "Docker container image"
+                },
+                "memory_requirements": {
+                  "type": "string",
+                  "pattern": "^\\d+[KMGT]?B$",
+                  "description": "Memory requirements"
+                },
+                "cpu_requirements": {
+                  "type": "string",
+                  "pattern": "^\\d+\\s+vCPU$",
+                  "description": "CPU requirements"
+                },
+                "gpu_requirements": {
+                  "type": "string",
+                  "enum": ["required", "recommended", "optional", "none"],
+                  "description": "GPU requirements"
+                },
+                "storage_requirements": {
+                  "type": "string",
+                  "pattern": "^\\d+[KMGT]?B$",
+                  "description": "Storage requirements"
+                }
+              }
+            },
+            "endpoints": {
+              "type": "object",
+              "required": ["inference", "health"],
+              "properties": {
+                "inference": {
+                  "type": "string",
+                  "pattern": "^/.*",
+                  "description": "Inference endpoint path"
+                },
+                "health": {
+                  "type": "string",
+                  "pattern": "^/.*",
+                  "description": "Health check endpoint path"
+                },
+                "metrics": {
+                  "type": "string",
+                  "pattern": "^/.*",
+                  "description": "Metrics endpoint path"
+                }
+              }
+            },
+            "testing": {
+              "type": "object",
+              "required": ["layer", "standard_questions", "role_tests"],
+              "properties": {
+                "layer": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4,
+                  "description": "Testing layer (1-4)"
+                },
+                "standard_questions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "description": "Standard test questions"
+                },
+                "role_tests": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "description": "Role-based tests"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "testing_layers": {
+      "type": "object",
+      "patternProperties": {
+        "^layer_\\d+$": {
+          "type": "object",
+          "required": ["name", "description", "models", "pre_prompt_template", "complexity", "expected_capabilities"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Layer name"
+            },
+            "description": {
+              "type": "string",
+              "description": "Layer description"
+            },
+            "models": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Models in this layer"
+            },
+            "pre_prompt_template": {
+              "type": "string",
+              "description": "Pre-prompt template name"
+            },
+            "complexity": {
+              "type": "string",
+              "enum": ["low", "medium", "high", "enterprise"],
+              "description": "Complexity level"
+            },
+            "expected_capabilities": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Expected capabilities"
+            }
+          }
+        }
+      }
+    },
+    "environments": {
+      "type": "object",
+      "patternProperties": {
+        "^(dev|staging|prod|test)$": {
+          "type": "object",
+          "required": ["enabled_models", "auto_stop", "cost_budget", "instance_limits"],
+          "properties": {
+            "enabled_models": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Models enabled in this environment"
+            },
+            "auto_stop": {
+              "type": "boolean",
+              "description": "Auto-stop functionality enabled"
+            },
+            "cost_budget": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Monthly cost budget in USD"
+            },
+            "instance_limits": {
+              "type": "object",
+              "required": ["max_instances", "max_memory"],
+              "properties": {
+                "max_instances": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Maximum number of instances"
+                },
+                "max_memory": {
+                  "type": "string",
+                  "pattern": "^\\d+[KMGT]?B$",
+                  "description": "Maximum memory allocation"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+} 

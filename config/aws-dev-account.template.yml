@@ -1,0 +1,169 @@
+# AWS DEV Account Configuration Template
+# Copy this file to aws-dev-account.yml and replace all REPLACE_WITH_* placeholders
+
+aws_account:
+  type: "development"
+  account_id: "REPLACE_WITH_ACTUAL_DEV_ACCOUNT_ID"
+  region: "REPLACE_WITH_AWS_REGION"  # e.g., us-east-1, eu-west-1
+  profile: "REPLACE_WITH_AWS_CLI_PROFILE"  # AWS CLI profile name
+  
+  # Development account constraints
+  constraints:
+    # Cost controls for dev account
+    max_monthly_cost: 100  # USD - adjust as needed
+    auto_stop_enabled: true
+    auto_stop_schedule: "rate(15 minutes)"
+    
+    # Resource limits
+    max_ecs_instances: 2
+    max_s3_buckets: 5
+    max_cloudwatch_log_retention: 7  # days
+    
+    # Security settings for dev
+    public_access_allowed: false  # SECURITY: Set to false for production-like security
+    detailed_monitoring: false   # Cost optimization
+    
+  # Development-specific resource naming
+  resource_naming:
+    prefix: "deployer-ddf-mod-llm-models"
+    environment: "dev"
+    suffix: "dev-account"
+    
+    # Specific naming patterns for dev account
+    iam_roles:
+      execution_role: "deployer-ddf-mod-llm-models-dev-execution-role"
+      task_role: "deployer-ddf-mod-llm-models-dev-task-role"
+      auto_stop_role: "deployer-ddf-mod-llm-models-dev-auto-stop-role"
+    
+    infrastructure:
+      vpc: "deployer-ddf-mod-llm-models-dev-vpc"
+      cluster: "deployer-ddf-mod-llm-models-dev"
+      load_balancer: "deployer-ddf-mod-llm-models-dev-alb"
+      log_group: "/ecs/deployer-ddf-mod-llm-models-dev"
+      
+    storage:
+      results_bucket: "deployer-ddf-mod-llm-models-dev-results-${AWS::AccountId}"
+      logs_bucket: "deployer-ddf-mod-llm-models-dev-logs-${AWS::AccountId}"
+      queue: "deployer-ddf-mod-llm-models-dev-queue"
+
+# Development environment settings
+development:
+  # Reduced resource allocation for cost optimization
+  compute:
+    cpu: 1024      # 1 vCPU (vs 2048 for prod)
+    memory: 2048   # 2 GB (vs 4096 for prod)
+    desired_count: 1  # Single instance for dev
+    
+  # Development-friendly settings
+  deployment:
+    health_check_grace_period: 60  # Faster startup
+    deployment_timeout: 600        # 10 minutes max
+    rollback_enabled: true
+    
+  # Logging optimized for development
+  logging:
+    level: "DEBUG"
+    retention_days: 7
+    structured_logging: true
+    
+  # Development testing settings
+  testing:
+    load_testing_enabled: false
+    performance_monitoring: "basic"
+    error_tracking: "enabled"
+
+# Security settings for dev account
+security:
+  # Development-appropriate security
+  encryption:
+    s3_encryption: "AES256"  # Simpler than KMS for dev
+    ebs_encryption: false    # Cost optimization
+    
+  # Network security for dev
+  networking:
+    vpc_flow_logs: false     # Cost optimization
+    nat_gateway: false       # Use NAT instance for cost
+    
+  # IAM settings for dev account
+  iam:
+    # More permissive for development
+    cross_account_access: false
+    mfa_required: false
+    session_duration: 3600   # 1 hour
+    
+    # Development-specific permissions
+    additional_permissions:
+      - "logs:CreateLogGroup"
+      - "logs:CreateLogStream"
+      - "logs:DescribeLogGroups"
+      - "logs:DescribeLogStreams"
+
+# Cost monitoring for dev account
+cost_management:
+  # Budget alerts for development
+  budget:
+    monthly_limit: 100  # USD
+    alert_thresholds: [50, 80, 95]  # Percentage of budget
+    
+  # Cost optimization features
+  optimization:
+    spot_instances: true      # Use spot for cost savings
+    scheduled_scaling: true   # Scale down during off-hours
+    unused_resource_cleanup: true
+    
+  # Billing alerts
+  alerts:
+    email: "REPLACE_WITH_NOTIFICATION_EMAIL"
+    slack_webhook: "REPLACE_WITH_SLACK_WEBHOOK_OR_LEAVE_EMPTY"  # Optional
+    
+# Development workflow integration
+workflow:
+  # CI/CD settings for dev account
+  deployment:
+    auto_deploy_on_push: true
+    branch_protection: false  # More flexible for dev
+    
+  # Development tools integration
+  tools:
+    aws_cli_profile: "REPLACE_WITH_AWS_CLI_PROFILE"
+    terraform_workspace: "dev"
+    kubectl_context: "dev"
+    
+# Monitoring for development
+monitoring:
+  # Simplified monitoring for dev
+  cloudwatch:
+    detailed_monitoring: false
+    custom_metrics: false
+    
+  # Development-appropriate alerting
+  alerting:
+    critical_only: true
+    notification_channels: ["email"]
+    
+# Backup and disaster recovery for dev
+backup:
+  # Minimal backup for development
+  enabled: false
+  retention_days: 3
+  cross_region_replication: false
+
+# Environment-specific tags
+tags:
+  Environment: "development"
+  Project: "deployer-ddf-mod-llm-models"
+  Owner: "REPLACE_WITH_OWNER_EMAIL"
+  CostCenter: "development"
+  AutoStop: "enabled"
+  BackupRequired: "false"
+  MonitoringLevel: "basic"
+  
+# Development account specific notes
+notes:
+  - "This is a development AWS account configuration"
+  - "Cost optimization is prioritized over high availability"
+  - "Auto-stop functionality is enabled to control costs"
+  - "Resources are tagged for easy identification and cleanup"
+  - "Security is development-appropriate, not production-grade"
+  - "All resources should be considered ephemeral"
+  - "IMPORTANT: Replace all REPLACE_WITH_* placeholders before use" 
