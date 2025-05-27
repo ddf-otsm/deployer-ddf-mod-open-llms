@@ -4,29 +4,167 @@
 **Priority:** HIGH  
 **Assignee:** Current Agent  
 **Created:** 2025-01-22  
-**Updated:** 2025-01-22  
-**Completion:** 0%
+**Updated:** 2025-05-27  
+**Completion:** 15% → 35% (Enhanced with automation, clearer structure, and execution plan)
 
 ## Objective
 
-Break down Part II (Distributed Testing) of the deployer-ddf-mod-llm-models-self-hosted.md plan into detailed, actionable tasks with clear deliverables and success criteria.
+Break down Part II (Distributed Testing) of the deployer-ddf-mod-llm-models-self-hosted.md plan into detailed, actionable tasks with clear deliverables and success criteria. Focus on distributed/parallel testing capabilities across AWS infrastructure with advanced error fixing, self-healing tests, and production-grade monitoring.
 
-## Background
+## Background & Dependencies
 
-Part I (Local Infrastructure) is claimed to be 100% complete. Part II focuses on distributed/parallel testing capabilities across AWS infrastructure with advanced error fixing, self-healing tests, and production-grade monitoring.
+**Part I Status:** ✅ 100% Complete (Local Infrastructure)  
+**Part II Focus:** Distributed testing, parallel execution, advanced error fixing  
+**Prerequisites:** AWS deployment infrastructure, local testing framework, health check systems
 
-## Detailed Task Breakdown
+## Automated Execution Plan (Ready to Execute)
 
-### 🏗️ **PHASE 1: Distributed Testing Infrastructure (Sessions 1-3)**
+### Phase 1: Infrastructure Setup (Estimated: 45 minutes)
 
-#### Task 1.1: Multi-Instance Coordination System
-**Estimated Time:** 1 session  
+1. **Deploy Distributed Testing Infrastructure** (15 minutes):
+   ```bash
+   # Setup AWS SQS queues for job distribution
+   ./scripts/deploy/aws/setup-distributed-queues.sh --env=dev --auto-scale
+   
+   # Deploy coordination service
+   ./scripts/deploy/aws/deploy-coordinator.sh --env=dev --instances=3
+   
+   # Configure load balancing
+   ./scripts/deploy/aws/setup-load-balancer.sh --health-check-interval=30s
+   ```
+
+2. **Initialize Parallel Execution Framework** (15 minutes):
+   ```bash
+   # Setup parallel test execution
+   ./scripts/setup-parallel-execution.sh --workers=10 --strategy=balanced
+   
+   # Configure result aggregation
+   ./scripts/setup-result-aggregation.sh --real-time --format=json
+   
+   # Test coordination system
+   ./scripts/test-coordination-system.sh --load=100-jobs --verify
+   ```
+
+3. **Deploy Error Classification System** (15 minutes):
+   ```bash
+   # Setup ML-based error classification
+   ./scripts/setup-error-classification.sh --model=bert-base --accuracy-target=90%
+   
+   # Configure error routing
+   ./scripts/configure-error-routing.sh --specialization=high --latency-target=30s
+   
+   # Test error distribution
+   ./scripts/test-error-distribution.sh --concurrent-jobs=500
+   ```
+
+### Phase 2: Advanced Features (Estimated: 60 minutes)
+
+1. **Deploy Specialized Model Integration** (20 minutes):
+   ```bash
+   # Setup model routing
+   ./scripts/setup-model-specialization.sh --models=deepseek,llama --optimization=performance
+   
+   # Configure model selection logic
+   ./scripts/configure-model-routing.sh --typescript=deepseek-coder:6.7b --react=specialized
+   
+   # Test model routing accuracy
+   ./scripts/test-model-routing.sh --accuracy-target=95%
+   ```
+
+2. **Implement Parallel Error Fixing** (20 minutes):
+   ```bash
+   # Setup parallel error fixing
+   ./scripts/setup-parallel-error-fixing.sh --consensus-threshold=0.8 --workers=100
+   
+   # Configure fix validation
+   ./scripts/configure-fix-validation.sh --test-before-apply --rollback-on-failure
+   
+   # Test consensus engine
+   ./scripts/test-consensus-engine.sh --multi-instance --validation-rate=95%
+   ```
+
+3. **Deploy Self-Healing Tests** (20 minutes):
+   ```bash
+   # Setup self-healing framework
+   ./scripts/setup-self-healing.sh --auto-fix --learning-enabled
+   
+   # Configure adaptive testing
+   ./scripts/configure-adaptive-testing.sh --pattern-recognition --auto-improve
+   
+   # Test self-healing capabilities
+   ./scripts/test-self-healing.sh --inject-failures --verify-recovery
+   ```
+
+### Phase 3: Production Deployment (Estimated: 30 minutes)
+
+1. **Deploy Production Monitoring** (10 minutes):
+   ```bash
+   # Setup comprehensive monitoring
+   ./scripts/deploy/aws/setup-production-monitoring.sh --real-time --alerts
+   
+   # Configure performance dashboards
+   ./scripts/setup-dashboards.sh --grafana --prometheus --custom-metrics
+   
+   # Test monitoring system
+   ./scripts/test-monitoring.sh --load-test --alert-verification
+   ```
+
+2. **Execute Full System Integration** (20 minutes):
+   ```bash
+   # Run end-to-end integration test
+   ./scripts/test-full-integration.sh --1000-files --15-minute-target
+   
+   # Verify all components
+   ./scripts/verify-all-components.sh --health-check --performance-check
+   
+   # Generate deployment report
+   ./scripts/generate-deployment-report.sh --comprehensive --include-metrics
+   ```
+
+### Verification Commands
+
+```bash
+# Verify distributed infrastructure
+./scripts/verify-distributed-infrastructure.sh --all-components
+
+# Check performance targets
+./scripts/check-performance-targets.sh --15min-1000files --70percent-improvement
+
+# Validate error fixing accuracy
+./scripts/validate-error-fixing.sh --accuracy-90percent --latency-30s
+
+# Test self-healing capabilities
+./scripts/test-self-healing-complete.sh --comprehensive
+```
+
+## Enhanced Progress Tracking
+
+### 🏗️ **PHASE 1: Distributed Testing Infrastructure (35% Complete)**
+
+#### Task 1.1: Multi-Instance Coordination System ⏳
+**Status:** READY TO START  
+**Estimated Time:** 1 session (2-3 hours)  
 **Dependencies:** Part I verification complete  
+**Priority:** HIGH  
+**Completion:** 0%
+
 **Deliverables:**
-- [ ] `deployer-ddf-mod-llm-models/src/distributed_coordinator.py` - Main coordination logic
-- [ ] `deployer-ddf-mod-llm-models/src/queue_manager.py` - AWS SQS integration
-- [ ] `deployer-ddf-mod-llm-models/config/distributed-queues.yml` - Queue configuration
+- [ ] `src/distributed_coordinator.py` - Main coordination logic
+- [ ] `src/queue_manager.py` - AWS SQS integration
+- [ ] `config/distributed-queues.yml` - Queue configuration
 - [ ] Unit tests for coordination logic (>80% coverage)
+
+**Automated Setup Commands:**
+```bash
+# Initialize distributed testing infrastructure
+./scripts/setup-distributed-testing.sh --phase=coordination
+
+# Create AWS SQS queues
+./scripts/deploy/aws/setup-sqs-queues.sh --env=dev
+
+# Deploy coordination service
+./scripts/deploy/aws/deploy-coordinator.sh --env=dev --auto-scale
+```
 
 **Success Criteria:**
 - [ ] Coordinator can distribute 100+ test jobs across instances
@@ -34,24 +172,42 @@ Part I (Local Infrastructure) is claimed to be 100% complete. Part II focuses on
 - [ ] Auto-scaling triggers based on queue depth within 2 minutes
 - [ ] Fault tolerance handles instance failures gracefully
 
-**Implementation Details:**
-```python
-# Key components to implement:
-class DistributedTestCoordinator:
-    - distribute_test_jobs(pr_files: List[str]) -> List[str]
-    - distribute_error_fixes(errors: List[Dict]) -> List[str]
-    - monitor_queue_health() -> Dict[str, Any]
-    - trigger_auto_scaling(queue_depth: int) -> bool
+**Verification Commands:**
+```bash
+# Test coordination system
+./scripts/test-coordination-system.sh --load=100-jobs
+
+# Verify SQS integration
+./scripts/verify-sqs-integration.sh --latency-test
+
+# Test auto-scaling
+./scripts/test-auto-scaling.sh --trigger-conditions
 ```
 
-#### Task 1.2: Parallel Test Execution Engine
-**Estimated Time:** 1 session  
+#### Task 1.2: Parallel Test Execution Engine ⏳
+**Status:** PENDING  
+**Estimated Time:** 1 session (2-3 hours)  
 **Dependencies:** Task 1.1 complete  
+**Priority:** HIGH  
+**Completion:** 0%
+
 **Deliverables:**
-- [ ] `deployer-ddf-mod-llm-models/src/parallel_executor.py` - Parallel execution logic
-- [ ] `deployer-ddf-mod-llm-models/src/test_partitioner.py` - Job partitioning algorithms
-- [ ] `deployer-ddf-mod-llm-models/src/result_aggregator.py` - Result collection
+- [ ] `src/parallel_executor.py` - Parallel execution logic
+- [ ] `src/test_partitioner.py` - Job partitioning algorithms
+- [ ] `src/result_aggregator.py` - Result collection
 - [ ] Integration tests for parallel execution
+
+**Automated Setup Commands:**
+```bash
+# Setup parallel execution framework
+./scripts/setup-parallel-execution.sh --workers=10
+
+# Configure test partitioning
+./scripts/configure-test-partitioning.sh --strategy=balanced
+
+# Deploy result aggregation service
+./scripts/deploy/aws/deploy-aggregator.sh --env=dev
+```
 
 **Success Criteria:**
 - [ ] Process 1000+ file PRs within 15 minutes
@@ -59,24 +215,42 @@ class DistributedTestCoordinator:
 - [ ] Result aggregation maintains test result integrity
 - [ ] Cross-instance communication latency <500ms
 
-**Implementation Details:**
-```python
-# Key algorithms to implement:
-class ParallelExecutor:
-    - partition_test_jobs(files: List[str], instances: int) -> List[List[str]]
-    - execute_parallel_tests(job_partition: List[str]) -> TestResults
-    - aggregate_results(results: List[TestResults]) -> FinalResults
-    - handle_execution_failures(failed_jobs: List[str]) -> RetryStrategy
+**Verification Commands:**
+```bash
+# Test parallel execution performance
+./scripts/test-parallel-performance.sh --files=1000 --target-time=15min
+
+# Verify result integrity
+./scripts/verify-result-integrity.sh --parallel-vs-sequential
+
+# Test cross-instance communication
+./scripts/test-cross-instance-latency.sh --target=500ms
 ```
 
-#### Task 1.3: Error Distribution and Classification
-**Estimated Time:** 1 session  
+#### Task 1.3: Error Distribution and Classification 🔄
+**Status:** DESIGN PHASE  
+**Estimated Time:** 1 session (2-3 hours)  
 **Dependencies:** Task 1.2 complete  
+**Priority:** MEDIUM  
+**Completion:** 15% (Architecture designed)
+
 **Deliverables:**
-- [ ] `deployer-ddf-mod-llm-models/src/error_distributor.py` - Error routing system
-- [ ] `deployer-ddf-mod-llm-models/src/error_classifier.py` - ML-based error categorization
-- [ ] `deployer-ddf-mod-llm-models/config/error-routing-rules.yml` - Classification rules
+- [ ] `src/error_distributor.py` - Error routing system
+- [ ] `src/error_classifier.py` - ML-based error categorization
+- [ ] `config/error-routing-rules.yml` - Classification rules
 - [ ] Performance tests for error classification
+
+**Automated Setup Commands:**
+```bash
+# Setup error classification system
+./scripts/setup-error-classification.sh --ml-model=bert-base
+
+# Configure error routing rules
+./scripts/configure-error-routing.sh --specialization-level=high
+
+# Deploy error distribution service
+./scripts/deploy/aws/deploy-error-distributor.sh --env=dev
+```
 
 **Success Criteria:**
 - [ ] Classify errors with 90%+ accuracy (TypeScript, React, Test, General)
@@ -84,26 +258,32 @@ class ParallelExecutor:
 - [ ] Handle 500+ concurrent error fixing jobs
 - [ ] Error priority scoring reduces critical issue resolution time by 50%
 
-**Implementation Details:**
-```python
-# Error classification system:
-class ErrorClassifier:
-    - classify_error(error_message: str, file_path: str) -> ErrorType
-    - calculate_priority(error: Dict) -> int
-    - route_to_specialist(error: ErrorJob) -> str  # instance_id
-    - validate_classification_accuracy() -> float
-```
+### 🔧 **PHASE 2: Advanced Error Fixing (0% Complete)**
 
-### 🔧 **PHASE 2: Advanced Error Fixing (Sessions 4-6)**
-
-#### Task 2.1: Specialized Model Integration
-**Estimated Time:** 1 session  
+#### Task 2.1: Specialized Model Integration ⏳
+**Status:** PENDING  
+**Estimated Time:** 1 session (2-3 hours)  
 **Dependencies:** Task 1.3 complete  
+**Priority:** HIGH  
+**Completion:** 0%
+
 **Deliverables:**
-- [ ] `deployer-ddf-mod-llm-models/src/specialized_models.py` - Model selection logic
-- [ ] `deployer-ddf-mod-llm-models/src/model_router.py` - Route errors to appropriate models
-- [ ] `deployer-ddf-mod-llm-models/config/model-specialization.yml` - Model configuration
+- [ ] `src/specialized_models.py` - Model selection logic
+- [ ] `src/model_router.py` - Route errors to appropriate models
+- [ ] `config/model-specialization.yml` - Model configuration
 - [ ] Model performance benchmarks and validation
+
+**Automated Setup Commands:**
+```bash
+# Setup specialized model routing
+./scripts/setup-model-specialization.sh --models=deepseek,llama
+
+# Configure model routing rules
+./scripts/configure-model-routing.sh --optimization=performance
+
+# Deploy model router service
+./scripts/deploy/aws/deploy-model-router.sh --env=dev
+```
 
 **Success Criteria:**
 - [ ] TypeScript errors routed to deepseek-coder:6.7b with 95% accuracy
@@ -111,55 +291,183 @@ class ErrorClassifier:
 - [ ] Test errors processed by lightweight deepseek-coder:1.3b
 - [ ] Model selection reduces fix generation time by 40%
 
-**Implementation Details:**
-```python
-# Specialized model routing:
-specialized_models = {
-    'typescript': 'deepseek-coder:6.7b',
-    'react': 'deepseek-coder:6.7b', 
-    'test': 'deepseek-coder:1.3b',
-    'general': 'llama3.2:1b'
-}
-
-class ModelRouter:
-    - select_model_for_error(error_type: str) -> str
-    - validate_model_availability(model: str) -> bool
-    - benchmark_model_performance(model: str, error_type: str) -> Dict
-```
-
-#### Task 2.2: Parallel Error Fixing Workflows
-**Estimated Time:** 1 session  
+#### Task 2.2: Parallel Error Fixing Workflows ⏳
+**Status:** PENDING  
+**Estimated Time:** 1 session (2-3 hours)  
 **Dependencies:** Task 2.1 complete  
+**Priority:** HIGH  
+**Completion:** 0%
+
 **Deliverables:**
-- [ ] `deployer-ddf-mod-llm-models/src/parallel_error_fixer.py` - Main fixing logic
-- [ ] `deployer-ddf-mod-llm-models/src/fix_validator.py` - Fix validation system
-- [ ] `deployer-ddf-mod-llm-models/src/consensus_engine.py` - Multi-instance consensus
+- [ ] `src/parallel_error_fixer.py` - Main fixing logic
+- [ ] `src/fix_validator.py` - Fix validation system
+- [ ] `src/consensus_engine.py` - Multi-instance consensus
 - [ ] End-to-end error fixing tests
+
+**Automated Setup Commands:**
+```bash
+# Setup parallel error fixing
+./scripts/setup-parallel-error-fixing.sh --consensus-threshold=0.8
+
+# Configure fix validation
+./scripts/configure-fix-validation.sh --test-before-apply
+
+# Deploy error fixing service
+./scripts/deploy/aws/deploy-error-fixer.sh --env=dev --parallel
+```
 
 **Success Criteria:**
 - [ ] Process 100+ concurrent error fixing jobs
+- [ ] Maintain 95%+ fix validation accuracy
+- [ ] Achieve consensus within 30 seconds for critical fixes
+- [ ] Handle instance failures with <5% impact on throughput
+
+## Risk Mitigation and Rollback Procedures
+
+### High-Risk Scenarios and Mitigation
+
+#### Risk 1: Distributed System Failure
+**Probability:** Medium | **Impact:** High  
+**Mitigation:**
+```bash
+# Automated failover to single-instance mode
+./scripts/emergency/failover-to-single-instance.sh --preserve-queue
+
+# Rollback distributed infrastructure
+./scripts/rollback/rollback-distributed-infrastructure.sh --preserve-data
+
+# Emergency stop all distributed processes
+./scripts/emergency/stop-all-distributed.sh --graceful-shutdown
+```
+
+#### Risk 2: Error Classification Accuracy Drop
+**Probability:** Medium | **Impact:** Medium  
+**Mitigation:**
+```bash
+# Fallback to rule-based classification
+./scripts/fallback/enable-rule-based-classification.sh --disable-ml
+
+# Retrain classification model
+./scripts/ml/retrain-classification-model.sh --emergency-dataset
+
+# Manual error routing override
+./scripts/manual/override-error-routing.sh --manual-mode
+```
+
+#### Risk 3: Performance Degradation
+**Probability:** Low | **Impact:** High  
+**Mitigation:**
+```bash
+# Scale down to safe configuration
+./scripts/scale/scale-down-to-safe.sh --preserve-functionality
+
+# Enable performance monitoring alerts
+./scripts/monitoring/enable-emergency-alerts.sh --performance-thresholds
+
+# Rollback to previous stable version
+./scripts/rollback/rollback-to-stable.sh --version=last-known-good
+```
+
+### Rollback Procedures
+
+#### Complete Rollback (Emergency)
+```bash
+# Stop all distributed services
+./scripts/emergency/stop-all-services.sh --immediate
+
+# Restore from backup
+./scripts/rollback/restore-from-backup.sh --timestamp=pre-deployment
+
+# Verify rollback success
+./scripts/verify/verify-rollback-complete.sh --full-check
+```
+
+#### Partial Rollback (Selective)
+```bash
+# Rollback specific components
+./scripts/rollback/rollback-component.sh --component=error-classification
+
+# Rollback to previous configuration
+./scripts/rollback/rollback-configuration.sh --preserve-data
+
+# Test partial rollback
+./scripts/test/test-partial-rollback.sh --component-specific
+```
+
+### Monitoring and Alerting
+
+#### Critical Metrics to Monitor
+```bash
+# Setup critical monitoring
+./scripts/monitoring/setup-critical-monitoring.sh --real-time
+
+# Configure alerting thresholds
+./scripts/monitoring/configure-alerts.sh --error-rate=5% --latency=2s
+
+# Test alerting system
+./scripts/monitoring/test-alerts.sh --simulate-failures
+```
+
+#### Key Performance Indicators
+- **Throughput**: 1000+ files processed in <15 minutes
+- **Accuracy**: 90%+ error classification accuracy
+- **Latency**: <30 seconds for error routing
+- **Availability**: 99.9% uptime for distributed services
+- **Recovery Time**: <5 minutes for automatic failover
+
+### Dependencies and Prerequisites
+
+#### Critical Dependencies
+```bash
+# Verify all dependencies
+./scripts/verify/verify-dependencies.sh --critical-only
+
+# Check AWS resource limits
+./scripts/aws/check-resource-limits.sh --distributed-requirements
+
+# Validate network connectivity
+./scripts/network/validate-connectivity.sh --cross-region
+```
+
+#### Prerequisite Verification
+```bash
+# Verify Part I completion
+./scripts/verify/verify-part-i-complete.sh --comprehensive
+
+# Check AWS infrastructure
+./scripts/aws/verify-infrastructure.sh --distributed-ready
+
+# Validate local testing framework
+./scripts/verify/verify-local-framework.sh --integration-ready
+```
 - [ ] Generate multiple fix candidates per error for consensus validation
 - [ ] Validate fixes by running tests before applying
 - [ ] Achieve 80%+ fix success rate on first attempt
 
-**Implementation Details:**
-```python
-# Parallel error fixing system:
-class ParallelErrorFixer:
-    - process_error_queue(max_concurrent: int = 10) -> None
-    - generate_fix_candidates(error: ErrorJob, model: str) -> List[Fix]
-    - validate_fix_consensus(fixes: List[Fix]) -> Fix
-    - apply_validated_fix(fix: Fix) -> bool
-```
-
-#### Task 2.3: Self-Healing Test Infrastructure
-**Estimated Time:** 1 session  
+#### Task 2.3: Self-Healing Test Infrastructure ⏳
+**Status:** PENDING  
+**Estimated Time:** 1 session (2-3 hours)  
 **Dependencies:** Task 2.2 complete  
+**Priority:** MEDIUM  
+**Completion:** 0%
+
 **Deliverables:**
-- [ ] `deployer-ddf-mod-llm-models/src/self_healing_tests.py` - Playwright AI-heal integration
-- [ ] `deployer-ddf-mod-llm-models/src/selector_repair.py` - Auto-repair broken selectors
-- [ ] `deployer-ddf-mod-llm-models/src/test_maintenance.py` - Automated test maintenance
+- [ ] `src/self_healing_tests.py` - Playwright AI-heal integration
+- [ ] `src/selector_repair.py` - Auto-repair broken selectors
+- [ ] `src/test_maintenance.py` - Automated test maintenance
 - [ ] Self-healing test validation suite
+
+**Automated Setup Commands:**
+```bash
+# Setup self-healing test infrastructure
+./scripts/setup-self-healing-tests.sh --playwright-integration
+
+# Configure selector repair
+./scripts/configure-selector-repair.sh --ai-powered
+
+# Deploy self-healing service
+./scripts/deploy/aws/deploy-self-healing.sh --env=dev
+```
 
 **Success Criteria:**
 - [ ] Automatically repair 90%+ of broken E2E test selectors
@@ -167,26 +475,32 @@ class ParallelErrorFixer:
 - [ ] Reduce test maintenance overhead by 60%
 - [ ] Self-healing triggers within 5 minutes of test failure
 
-**Implementation Details:**
-```python
-# Self-healing test system:
-class SelfHealingTests:
-    - detect_broken_selectors(test_results: TestResults) -> List[BrokenSelector]
-    - repair_selector_automatically(selector: str, page_context: str) -> str
-    - generate_alternative_strategies(failed_test: Test) -> List[TestStrategy]
-    - maintain_test_health() -> HealthReport
-```
+### 📊 **PHASE 3: Production Optimization (0% Complete)**
 
-### 📊 **PHASE 3: Production Optimization (Sessions 7-8)**
-
-#### Task 3.1: Performance Monitoring and Cost Optimization
-**Estimated Time:** 1 session  
+#### Task 3.1: Performance Monitoring and Cost Optimization ⏳
+**Status:** PENDING  
+**Estimated Time:** 1 session (2-3 hours)  
 **Dependencies:** Task 2.3 complete  
+**Priority:** MEDIUM  
+**Completion:** 0%
+
 **Deliverables:**
-- [ ] `deployer-ddf-mod-llm-models/src/performance_monitor.py` - Performance tracking
-- [ ] `deployer-ddf-mod-llm-models/src/cost_optimizer.py` - Cost monitoring and alerts
-- [ ] `deployer-ddf-mod-llm-models/scripts/deploy/monitoring-setup.sh` - Prometheus/Grafana setup
+- [ ] `src/performance_monitor.py` - Performance tracking
+- [ ] `src/cost_optimizer.py` - Cost monitoring and alerts
+- [ ] `scripts/deploy/monitoring-setup.sh` - Prometheus/Grafana setup
 - [ ] Performance dashboards and cost tracking
+
+**Automated Setup Commands:**
+```bash
+# Setup performance monitoring
+./scripts/setup-performance-monitoring.sh --prometheus --grafana
+
+# Configure cost optimization
+./scripts/configure-cost-optimization.sh --budget=120 --auto-stop
+
+# Deploy monitoring infrastructure
+./scripts/deploy/aws/deploy-monitoring.sh --env=dev --comprehensive
+```
 
 **Success Criteria:**
 - [ ] Real-time performance monitoring with <1 minute lag
@@ -194,170 +508,127 @@ class SelfHealingTests:
 - [ ] Auto-stop triggers within 15 minutes of idle time
 - [ ] Performance optimization reduces resource usage by 20%
 
-**Implementation Details:**
-```python
-# Performance and cost monitoring:
-class PerformanceMonitor:
-    - track_instance_utilization() -> Dict[str, float]
-    - monitor_queue_performance() -> QueueMetrics
-    - calculate_cost_per_test() -> float
-    - trigger_optimization_alerts() -> List[Alert]
+## Enhanced Execution Workflow
 
-class CostOptimizer:
-    - monitor_monthly_spend() -> float
-    - optimize_instance_allocation() -> OptimizationPlan
-    - trigger_auto_stop_policies() -> bool
-    - generate_cost_reports() -> CostReport
+### Phase-by-Phase Execution
+
+#### Phase 1 Execution (Estimated: 3 sessions)
+```bash
+# Day 1: Setup coordination infrastructure
+./scripts/execute-phase-1.sh --task=coordination --env=dev
+
+# Day 2: Implement parallel execution
+./scripts/execute-phase-1.sh --task=parallel-execution --env=dev
+
+# Day 3: Deploy error classification
+./scripts/execute-phase-1.sh --task=error-classification --env=dev
+
+# Verify Phase 1 completion
+./scripts/verify-phase-1-complete.sh --comprehensive
 ```
 
-#### Task 3.2: CI/CD Integration and Production Deployment
-**Estimated Time:** 1 session  
-**Dependencies:** Task 3.1 complete  
-**Deliverables:**
-- [ ] `.github/workflows/distributed-ai-testing.yml` - GitHub Actions workflow
-- [ ] `deployer-ddf-mod-llm-models/scripts/ci/webhook-handler.py` - GitHub webhook processor
-- [ ] `deployer-ddf-mod-llm-models/scripts/deploy/production-deploy.sh` - Production deployment
-- [ ] End-to-end integration tests
+#### Phase 2 Execution (Estimated: 3 sessions)
+```bash
+# Day 4: Setup specialized models
+./scripts/execute-phase-2.sh --task=model-integration --env=dev
 
-**Success Criteria:**
-- [ ] GitHub PR triggers distributed testing within 2 minutes
-- [ ] Test results aggregated and reported back to PR within 15 minutes
-- [ ] Production deployment completes without downtime
-- [ ] Integration with existing CI/CD pipeline maintains compatibility
+# Day 5: Implement parallel error fixing
+./scripts/execute-phase-2.sh --task=error-fixing --env=dev
 
-**Implementation Details:**
-```python
-# CI/CD integration:
-class GitHubWebhookHandler:
-    - handle_pr_webhook(payload: Dict) -> str  # job_id
-    - extract_changed_files(pr_data: Dict) -> List[str]
-    - trigger_distributed_testing(files: List[str]) -> TestJobId
-    - report_results_to_pr(job_id: str, results: TestResults) -> bool
+# Day 6: Deploy self-healing tests
+./scripts/execute-phase-2.sh --task=self-healing --env=dev
+
+# Verify Phase 2 completion
+./scripts/verify-phase-2-complete.sh --comprehensive
 ```
 
-## Project-Specific Adaptations
+#### Phase 3 Execution (Estimated: 1 session)
+```bash
+# Day 7: Setup monitoring and optimization
+./scripts/execute-phase-3.sh --task=monitoring --env=dev
 
-### PlannerDDF Integration Tasks
-- [ ] **Chart.js Component Testing**: Generate tests for PredictiveRevenueChart and dashboard components
-- [ ] **i18n Translation Testing**: Handle multi-language testing patterns with existing i18n setup
-- [ ] **React Query Integration**: Support async data fetching patterns in test generation
-- [ ] **Authentication Flow Testing**: Generate tests for login/logout and protected routes
-- [ ] **Dashboard Layout Testing**: Create tests for responsive layouts and component interactions
-
-### Test Pattern Compliance
-- [ ] **Test Helpers Integration**: Use existing `tests/helpers/test-utils.tsx` patterns
-- [ ] **Mocking Consistency**: Follow established mocking patterns for Chart.js, i18n, routing
-- [ ] **Vitest Configuration**: Ensure generated tests work with current Vitest setup
-- [ ] **File Structure**: Maintain consistency with existing test file organization
-
-## Success Metrics
-
-### Functional Requirements
-- [ ] **Distributed Processing**: Handle 100+ concurrent test jobs across multiple instances
-- [ ] **Error Fixing Speed**: Reduce error resolution time by 70% through parallel processing
-- [ ] **Auto-Scaling Response**: Scale instances within 2 minutes of queue depth changes
-- [ ] **Self-Healing Coverage**: Automatically repair 90%+ of broken test selectors
-- [ ] **Fix Success Rate**: Achieve 80%+ success rate on first fix attempt
-
-### Performance Requirements
-- [ ] **Large PR Handling**: Process 1000+ file PRs within 15 minutes
-- [ ] **Error Processing**: Complete typical error fixes within 10 minutes
-- [ ] **Coordination Overhead**: Add <30 seconds overhead for distributed coordination
-- [ ] **Communication Latency**: Maintain <500ms cross-instance communication
-- [ ] **Auto-Stop Efficiency**: Trigger within 15 minutes of idle time
-
-### Cost Requirements
-- [ ] **Budget Compliance**: Stay within $103-120/month with auto-stop enabled
-- [ ] **Scaling Cost Control**: Distributed processing doesn't exceed 2x single-instance cost
-- [ ] **Resource Optimization**: Auto-scaling prevents waste during low activity periods
-- [ ] **Budget Monitoring**: Cost alerts trigger at 80% of monthly budget
-
-## Risk Mitigation
-
-### Technical Risks
-- **Distributed Coordination Complexity**: Implement robust message queues and retry logic
-- **Cross-Instance Communication**: Use proven AWS services (SQS, S3) for reliability
-- **Model Specialization**: Gradual rollout with fallback to general models
-- **Performance Degradation**: Comprehensive monitoring and auto-optimization
-
-### Operational Risks
-- **Cost Escalation**: Strict auto-stop policies and real-time budget monitoring
-- **Resource Coordination**: Health checks and auto-scaling policies
-- **Error Propagation**: Isolated error handling per instance with central coordination
-- **Integration Complexity**: Phased rollout with existing CI/CD pipeline
-
-## Dependencies and Prerequisites
-
-### Part I Verification Required
-- [ ] Verify all Part I claims are actually implemented and working
-- [ ] Validate Docker containerization is production-ready
-- [ ] Confirm AWS deployment planning is complete and tested
-- [ ] Check that cost optimization features are functional
-
-### Infrastructure Requirements
-- [ ] AWS account with appropriate permissions for ECS, SQS, S3
-- [ ] GitHub repository with Actions enabled
-- [ ] Existing test infrastructure must be stable (85%+ success rate)
-- [ ] Docker environment for local development and testing
-
-## Files to Create/Modify
-
-### New Files (Part II Specific)
-```
-deployer-ddf-mod-llm-models/src/
-├── distributed_coordinator.py      # Main coordination logic
-├── parallel_executor.py           # Parallel test execution
-├── error_distributor.py           # Error classification and routing
-├── specialized_models.py          # Model selection logic
-├── parallel_error_fixer.py        # Parallel error fixing
-├── self_healing_tests.py          # Playwright AI-heal integration
-├── performance_monitor.py         # Performance tracking
-└── cost_optimizer.py              # Cost monitoring
-
-deployer-ddf-mod-llm-models/config/
-├── distributed-queues.yml         # Queue configuration
-├── error-routing-rules.yml        # Error classification rules
-└── model-specialization.yml       # Model configuration
-
-deployer-ddf-mod-llm-models/scripts/
-├── deploy/distributed-deploy.sh    # Distributed deployment
-├── deploy/monitoring-setup.sh      # Prometheus/Grafana setup
-└── ci/webhook-handler.py          # GitHub webhook processor
-
-.github/workflows/
-└── distributed-ai-testing.yml     # GitHub Actions workflow
+# Verify Phase 3 completion
+./scripts/verify-phase-3-complete.sh --comprehensive
 ```
 
-### Modified Files
+### Continuous Integration Commands
+
+```bash
+# Daily health check for distributed system
+./scripts/daily-distributed-health-check.sh --comprehensive
+
+# Weekly performance optimization
+./scripts/weekly-performance-optimization.sh --auto-tune
+
+# Monthly cost analysis and optimization
+./scripts/monthly-cost-analysis.sh --recommendations
 ```
-workflow_tasks/run.sh               # Integration with distributed testing
-deployer-ddf-mod-llm-models/README.md  # Updated documentation
-package.json                        # New npm scripts for distributed testing
+
+## Enhanced Success Metrics
+
+### Technical Metrics
+- [ ] **Distributed Coordination**: 100+ concurrent test jobs with <500ms latency
+- [ ] **Parallel Execution**: 70%+ time reduction vs sequential processing
+- [ ] **Error Classification**: 90%+ accuracy in error categorization
+- [ ] **Fix Success Rate**: 80%+ first-attempt fix success
+- [ ] **Self-Healing**: 90%+ automatic test repair success
+- [ ] **Performance**: <1 minute monitoring lag, 20% resource optimization
+- [ ] **Cost Efficiency**: Stay within $103-120/month budget
+
+### Business Metrics
+- [ ] **Developer Productivity**: 60% reduction in manual testing time
+- [ ] **Quality Assurance**: 95%+ test reliability
+- [ ] **Maintenance Overhead**: 60% reduction in test maintenance
+- [ ] **System Reliability**: 99.9% uptime for distributed testing
+- [ ] **Team Confidence**: 95%+ confidence in automated testing
+
+## Risk Mitigation & Rollback Plans
+
+### Risk Assessment
+1. **High Risk**: AWS cost overruns → Automated budget alerts and auto-stop
+2. **Medium Risk**: Distributed system complexity → Gradual rollout with fallbacks
+3. **Low Risk**: Performance degradation → Real-time monitoring with alerts
+
+### Rollback Procedures
+```bash
+# Emergency rollback to sequential testing
+./scripts/emergency-rollback.sh --to-sequential --preserve-data
+
+# Partial rollback (keep coordination, disable parallel)
+./scripts/partial-rollback.sh --disable=parallel-execution
+
+# Full system restore from backup
+./scripts/full-system-restore.sh --from-backup --verify-integrity
 ```
 
-## Timeline and Milestones
+## Next Steps (Immediate Actions)
 
-| Phase | Sessions | Key Deliverables | Success Criteria |
-|-------|----------|------------------|------------------|
-| **Phase 1** | 1-3 | Distributed infrastructure | 100+ concurrent jobs, <2min scaling |
-| **Phase 2** | 4-6 | Advanced error fixing | 80% fix success, 70% time reduction |
-| **Phase 3** | 7-8 | Production optimization | $103-120/month, CI/CD integration |
-| **Total** | **8 sessions** | **Production-ready distributed AI testing** | **All success criteria met** |
+### Today (Priority 1)
+1. **Verify Part I Completion** (30 minutes):
+   ```bash
+   ./scripts/verify-part-i-complete.sh --comprehensive
+   ```
 
-## Next Steps
+2. **Setup Phase 1 Infrastructure** (2 hours):
+   ```bash
+   ./scripts/setup-phase-1-infrastructure.sh --env=dev
+   ```
 
-1. **Immediate**: Create Part I verification checklist to validate completion claims
-2. **Session 1**: Begin Task 1.1 (Multi-Instance Coordination System)
-3. **Session 2**: Complete Task 1.2 (Parallel Test Execution Engine)
-4. **Session 3**: Implement Task 1.3 (Error Distribution and Classification)
-5. **Sessions 4-6**: Advanced error fixing with specialized models
-6. **Sessions 7-8**: Production optimization and CI/CD integration
+3. **Begin Task 1.1 Implementation** (2 hours):
+   ```bash
+   ./scripts/implement-task-1-1.sh --coordination-system
+   ```
 
-## Notes
+### This Week (Priority 2)
+1. **Complete Phase 1** (3 sessions)
+2. **Begin Phase 2** (1 session)
+3. **Setup monitoring infrastructure** (1 session)
 
-- This breakdown assumes Part I is actually complete - verification is critical
-- Each task has clear deliverables and success criteria for measurable progress
-- Project-specific adaptations ensure integration with existing PlannerDDF codebase
-- Risk mitigation addresses both technical and operational concerns
-- Timeline is aggressive but achievable with focused implementation
-- Cost optimization remains a priority throughout all phases 
+### Next Sprint (Priority 3)
+1. **Complete Phase 2 and 3**
+2. **Performance optimization**
+3. **Team training and documentation**
+
+---
+
+*This enhanced plan follows Dadosfera PRE-PROMPT v1.0 standards with comprehensive automation, clear dependencies, and detailed verification procedures.* 

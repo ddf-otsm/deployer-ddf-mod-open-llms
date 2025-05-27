@@ -16,7 +16,7 @@ fi
 
 # Load authentication configuration
 load_auth_config() {
-    local auth_config="$PROJECT_ROOT/config/auth-config.yml"
+    local auth_config="$PROJECT_ROOT/config/auth/auth-config-deployment.yml"
     
     if [ ! -f "$auth_config" ]; then
         error "Authentication configuration not found: $auth_config"

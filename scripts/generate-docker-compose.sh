@@ -11,7 +11,7 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 ENV="dev"
 PLATFORM="docker"
 CONFIG_FILE=""
-OUTPUT_FILE="$PROJECT_ROOT/docker-compose.yml"
+OUTPUT_FILE="$PROJECT_ROOT/config/docker/docker-compose-deployment.yml"
 
 # Colors for output
 RED='\033[0;31m'
@@ -55,7 +55,7 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: $0 [--env=ENV] [--platform=PLATFORM] [--output=FILE]"
             echo "  --env=ENV        Environment (default: dev)"
             echo "  --platform=PLATFORM  Platform (default: docker)"
-            echo "  --output=FILE    Output file (default: docker-compose.yml)"
+            echo "  --output=FILE    Output file (default: config/docker/docker-compose-deployment.yml)"
             exit 0
             ;;
         *)
@@ -65,7 +65,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-log "Generating docker-compose.yml for env=$ENV platform=$PLATFORM"
+log "Generating docker-compose-deployment.yml for env=$ENV platform=$PLATFORM"
 
 # Find configuration file
 CONFIG_FILE="$PROJECT_ROOT/config/${ENV}.${PLATFORM}.yml"
@@ -76,9 +76,9 @@ fi
 
 log "Using config: $CONFIG_FILE"
 
-# Generate docker-compose.yml
+# Generate docker-compose-deployment.yml
 cat > "$OUTPUT_FILE" << 'EOF'
-# Generated docker-compose.yml
+# Generated docker-compose-deployment.yml
 # DO NOT EDIT MANUALLY - Generated from config files
 # To regenerate: bash scripts/generate-docker-compose.sh --env=dev --platform=docker
 
@@ -168,6 +168,6 @@ echo "" >> "$OUTPUT_FILE"
 echo "# Generated on: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$OUTPUT_FILE"
 echo "# From config: $CONFIG_FILE" >> "$OUTPUT_FILE"
 
-success "Generated docker-compose.yml at: $OUTPUT_FILE"
+success "Generated docker-compose-deployment.yml at: $OUTPUT_FILE"
 log "To use: docker-compose up -d"
 log "To regenerate: bash scripts/generate-docker-compose.sh --env=$ENV --platform=$PLATFORM" 

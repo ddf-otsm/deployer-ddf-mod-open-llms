@@ -1,0 +1,73 @@
+# Keycloak Integration Configuration Template
+# Copy this file to config/auth/keycloak-integration-deployment.yml and replace all REPLACE_WITH_* placeholders
+
+keycloak:
+  enabled: true
+  server_url: "REPLACE_WITH_KEYCLOAK_SERVER_URL"  # e.g., http://localhost:8080
+  realm: "REPLACE_WITH_REALM_NAME"  # e.g., planner-ddf
+  client_id: "REPLACE_WITH_CLIENT_ID"  # e.g., deployer-ddf-mod-llm-models
+  client_secret: "${KEYCLOAK_CLIENT_SECRET}"  # From environment
+  
+  # Authentication flow
+  auth_flow: "authorization_code"
+  redirect_uri: "REPLACE_WITH_REDIRECT_URI"  # e.g., http://localhost:5000/auth/keycloak/callback
+  
+  # Token validation
+  token_validation:
+    enabled: true
+    introspection_endpoint: "/auth/realms/REPLACE_WITH_REALM_NAME/protocol/openid-connect/token/introspect"
+    userinfo_endpoint: "/auth/realms/REPLACE_WITH_REALM_NAME/protocol/openid-connect/userinfo"
+    
+  # User mapping
+  user_mapping:
+    username_claim: "preferred_username"
+    email_claim: "email"
+    roles_claim: "realm_access.roles"
+    
+  # Required roles for AI Testing Agent access
+  required_roles:
+    - "developer"
+    - "tester"
+    - "admin"
+
+# Integration with existing auth middleware
+authentication:
+  method: "keycloak"  # New auth method
+  
+  keycloak:
+    enabled: true
+    validate_token: true
+    cache_tokens: true
+    cache_duration: 300  # 5 minutes
+    
+    # Fallback to API token for non-Keycloak users
+    fallback_auth: "api_token"
+    
+    # CORS settings for PlannerDDF frontend
+    cors:
+      allowed_origins: 
+        - "REPLACE_WITH_FRONTEND_URL"  # e.g., http://localhost:5200
+        - "REPLACE_WITH_ALT_FRONTEND_URL"  # e.g., http://localhost:3000
+      allowed_credentials: true
+
+# Environment-specific overrides
+environments:
+  development:
+    keycloak:
+      server_url: "REPLACE_WITH_DEV_KEYCLOAK_URL"  # e.g., http://localhost:8080
+      realm: "REPLACE_WITH_DEV_REALM"  # e.g., planner-ddf-dev
+      verify_ssl: false  # For local development
+      
+  staging:
+    keycloak:
+      server_url: "REPLACE_WITH_STAGING_KEYCLOAK_URL"  # e.g., https://auth-staging.planner-ddf.com
+      realm: "REPLACE_WITH_STAGING_REALM"  # e.g., planner-ddf-staging
+      verify_ssl: true
+      
+  production:
+    keycloak:
+      server_url: "REPLACE_WITH_PROD_KEYCLOAK_URL"  # e.g., https://auth.planner-ddf.com
+      realm: "REPLACE_WITH_PROD_REALM"  # e.g., planner-ddf
+      verify_ssl: true
+      required_roles:
+        - "ai-testing-admin" 

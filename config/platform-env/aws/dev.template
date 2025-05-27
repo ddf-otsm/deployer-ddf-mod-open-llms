@@ -1,5 +1,34 @@
-# Environment Configuration Template for AWS Development
-# This file is used to generate .env during --setup
+# Environment Configuration for AWS Platform - Development
+# This file is copied to .env during setup
+
+# Application Configuration
+NODE_ENV=development
+PORT=7001
+HOST=0.0.0.0
+
+# Authentication
+AUTH_DISABLED=false
+
+# Logging
+LOG_LEVEL=info
+
+# AWS Configuration
+AWS_REGION=us-east-1
+
+# Ollama Configuration (AWS service)
+OLLAMA_HOST=localhost:11434
+
+# Development Features
+ENABLE_DEBUG=false
+ENABLE_SWAGGER=true
+
+# AWS-specific settings
+PLATFORM=aws
+ENVIRONMENT=dev
+
+# Secrets (set these environment variables or use AWS Secrets Manager)
+# export KEYCLOAK_CLIENT_SECRET="your-secret-here"
+# export AWS_ACCOUNT_ID="123456789012"
 
 # Application Configuration
 NODE_ENV=development

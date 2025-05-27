@@ -1,0 +1,132 @@
+# AWS Resources Discovery Report
+# Generated: 2025-05-27 15:08:30 UTC
+# Region: us-east-1
+# Project: deployer-ddf-mod-open-llms
+
+discovery:
+  timestamp: "20250527_120830"
+  region: "us-east-1"
+  project_prefix: "deployer-ddf-llm"
+
+resources:
+  cloudformation:
+    stacks:
+      # Example: When deployed, this would contain actual stack information
+      - name: "deployer-ddf-llm-dev"
+        status: "CREATE_COMPLETE"
+        outputs:
+          - key: "VPCId"
+            value: "vpc-0123456789abcdef0"
+            description: "VPC ID for the deployment"
+          - key: "PublicSubnets"
+            value: "subnet-0123456789abcdef0,subnet-0123456789abcdef1"
+            description: "Public subnet IDs"
+          - key: "PrivateSubnets"
+            value: "subnet-0123456789abcdef2,subnet-0123456789abcdef3"
+            description: "Private subnet IDs"
+          - key: "ECSCluster"
+            value: "arn:aws:ecs:us-east-1:123456789012:cluster/deployer-ddf-llm-cluster-dev"
+            description: "ECS Cluster ARN"
+          - key: "ALBDNSName"
+            value: "deployer-ddf-llm-alb-dev-1234567890.us-east-1.elb.amazonaws.com"
+            description: "Application Load Balancer DNS name"
+          - key: "S3Bucket"
+            value: "deployer-ddf-llm-results-dev-123456789012"
+            description: "S3 bucket for storing results"
+          - key: "TestQueue"
+            value: "https://sqs.us-east-1.amazonaws.com/123456789012/deployer-ddf-llm-test-jobs-dev"
+            description: "SQS queue for test jobs"
+      # Example: Production stack
+      - name: "deployer-ddf-llm-prd"
+        status: "CREATE_COMPLETE"
+        outputs:
+          - key: "VPCId"
+            value: "vpc-0987654321fedcba0"
+            description: "Production VPC ID"
+          - key: "ECSCluster"
+            value: "arn:aws:ecs:us-east-1:123456789012:cluster/deployer-ddf-llm-cluster-prd"
+            description: "Production ECS Cluster ARN"
+            
+  ecs:
+    clusters:
+      - name: "deployer-ddf-llm-cluster-dev"
+        arn: "arn:aws:ecs:us-east-1:123456789012:cluster/deployer-ddf-llm-cluster-dev"
+        services:
+          - name: "deployer-ddf-llm-service-dev"
+            arn: "arn:aws:ecs:us-east-1:123456789012:service/deployer-ddf-llm-cluster-dev/deployer-ddf-llm-service-dev"
+      - name: "deployer-ddf-llm-cluster-prd"
+        arn: "arn:aws:ecs:us-east-1:123456789012:cluster/deployer-ddf-llm-cluster-prd"
+        services:
+          - name: "deployer-ddf-llm-service-prd"
+            arn: "arn:aws:ecs:us-east-1:123456789012:service/deployer-ddf-llm-cluster-prd/deployer-ddf-llm-service-prd"
+            
+  s3:
+    buckets:
+      - name: "deployer-ddf-llm-results-dev-123456789012"
+        region: "us-east-1"
+      - name: "deployer-ddf-llm-results-prd-123456789012"
+        region: "us-east-1"
+      - name: "deployer-ddf-llm-artifacts-123456789012"
+        region: "us-east-1"
+        
+  load_balancers:
+    application:
+      - name: "deployer-ddf-llm-alb-dev"
+        dns_name: "deployer-ddf-llm-alb-dev-1234567890.us-east-1.elb.amazonaws.com"
+        arn: "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/deployer-ddf-llm-alb-dev/1234567890abcdef"
+      - name: "deployer-ddf-llm-alb-prd"
+        dns_name: "deployer-ddf-llm-alb-prd-0987654321.us-east-1.elb.amazonaws.com"
+        arn: "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/deployer-ddf-llm-alb-prd/0987654321fedcba"
+        
+  sqs:
+    queues:
+      - name: "deployer-ddf-llm-test-jobs-dev"
+        url: "https://sqs.us-east-1.amazonaws.com/123456789012/deployer-ddf-llm-test-jobs-dev"
+      - name: "deployer-ddf-llm-test-jobs-dlq-dev"
+        url: "https://sqs.us-east-1.amazonaws.com/123456789012/deployer-ddf-llm-test-jobs-dlq-dev"
+      - name: "deployer-ddf-llm-test-jobs-prd"
+        url: "https://sqs.us-east-1.amazonaws.com/123456789012/deployer-ddf-llm-test-jobs-prd"
+      - name: "deployer-ddf-llm-test-jobs-dlq-prd"
+        url: "https://sqs.us-east-1.amazonaws.com/123456789012/deployer-ddf-llm-test-jobs-dlq-prd"
+        
+  cloudwatch:
+    log_groups:
+      - name: "/aws/ecs/deployer-ddf-llm-dev"
+        retention_days: "30"
+      - name: "/aws/ecs/deployer-ddf-llm-prd"
+        retention_days: "90"
+      - name: "/aws/lambda/deployer-ddf-llm-autostop-dev"
+        retention_days: "14"
+
+# Additional AWS Resources (discovered during actual deployment)
+additional_resources:
+  iam_roles:
+    - name: "deployer-ddf-llm-execution-role-dev"
+      arn: "arn:aws:iam::123456789012:role/deployer-ddf-llm-execution-role-dev"
+    - name: "deployer-ddf-llm-task-role-dev"
+      arn: "arn:aws:iam::123456789012:role/deployer-ddf-llm-task-role-dev"
+      
+  security_groups:
+    - name: "deployer-ddf-llm-alb-sg-dev"
+      id: "sg-0123456789abcdef0"
+    - name: "deployer-ddf-llm-ecs-sg-dev"
+      id: "sg-0123456789abcdef1"
+      
+  target_groups:
+    - name: "deployer-ddf-llm-tg-dev"
+      arn: "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/deployer-ddf-llm-tg-dev/1234567890abcdef"
+
+summary:
+  discovery_completed: true
+  total_resource_types_checked: 6
+  resources_found: true
+  environments_detected: ["dev", "prd"]
+  generated_files:
+    - "config/deployments/may_2025/discovered-resources-20250527_120830.yml"
+    - "config/deployments/may_2025/.env.aws-secrets-20250527_120830"
+    
+notes:
+  - "This file contains example data that would be populated during actual AWS deployment"
+  - "Replace example values with actual resource IDs when deployment is complete"
+  - "Use this as a template for understanding the expected resource structure"
+  - "Run the aws-resource-discovery.sh script after deployment to populate with real data"

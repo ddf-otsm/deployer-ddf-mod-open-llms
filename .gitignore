@@ -24,6 +24,11 @@ build/
 .env.*
 !.env.example
 
+# Secrets and deployment files - NEVER COMMIT THESE
+secrets/
+*.secret
+*.secrets
+
 # Sensitive files - NEVER COMMIT THESE
 *.key
 *.pem
@@ -40,7 +45,6 @@ build/
 # Sensitive directories - NEVER COMMIT THESE
 api-tokens/
 aws-credentials/
-secrets/
 private_keys/
 certificates/
 service_accounts/

@@ -26,7 +26,7 @@ class AuthenticationError(Exception):
 class AuthMiddleware:
     """Professional authentication middleware for AI Testing Agent"""
     
-    def __init__(self, config_path: str = "/app/config/auth-config.yml"):
+    def __init__(self, config_path: str = "/app/config/auth/auth-config-deployment.yml"):
         self.config = self._load_config(config_path)
         self.auth_method = self.config['authentication']['method']
         self.tokens = {}  # In-memory token store (use Redis in production)

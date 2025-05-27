@@ -1,0 +1,85 @@
+# Port Configuration for DeployerDDF Module Open Source LLM Models
+# Centralized port management for all environments and platforms
+
+# Default port ranges by environment
+environments:
+  development:
+    api_port: 7001
+    frontend_port: 7002
+    test_port: 7003
+    debug_port: 7004
+    
+  staging:
+    api_port: 7011
+    frontend_port: 7012
+    test_port: 7013
+    debug_port: 7014
+    
+  production:
+    api_port: 8001
+    frontend_port: 8002
+    test_port: 8003
+    debug_port: 8004
+
+# Platform-specific overrides
+platforms:
+  cursor:
+    development:
+      api_port: 7001
+      host: "localhost"
+      
+  replit:
+    development:
+      api_port: 3000  # Replit requires 3000
+      host: "0.0.0.0"  # Replit requires external access
+      
+  docker:
+    development:
+      api_port: 7001
+      host: "0.0.0.0"  # Docker needs external access
+      
+  aws:
+    development:
+      api_port: 7001
+      host: "0.0.0.0"
+    production:
+      api_port: 80
+      host: "0.0.0.0"
+
+# External service ports (fixed)
+external_services:
+  ollama: 11434
+  prometheus: 9090
+  grafana: 3001
+  redis: 6379
+  postgres: 5432
+
+# Security settings by platform
+security:
+  localhost_only:
+    - cursor
+  external_access_allowed:
+    - replit
+    - docker
+    - aws
+    
+# Port ranges for dynamic allocation
+port_ranges:
+  development: 
+    start: 7001
+    end: 7999
+  staging:
+    start: 7001
+    end: 7999
+  production:
+    start: 8001
+    end: 8999
+    
+# Reserved ports (never use)
+reserved_ports:
+  - 22    # SSH
+  - 80    # HTTP (production only)
+  - 443   # HTTPS (production only)
+  - 3000  # Replit specific
+  - 5000  # Common dev port
+  - 8080  # Common alt HTTP 

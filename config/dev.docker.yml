@@ -9,7 +9,7 @@ extends: "dev.yml"
 
 # Docker-specific settings
 docker:
-  compose_file: "docker-compose.yml"
+  compose_file: "secrets/deployments/docker/docker-compose-deployment.yml"
   build_context: "."
   dockerfile: "Dockerfile"
   target: "production"

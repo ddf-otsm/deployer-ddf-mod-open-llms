@@ -1,142 +1,220 @@
-# AI Testing Agent Documentation
+# Deployer DDF Mod Open LLMs - Documentation Index
 
-## 🚀 Overview
+*Last Updated: 2025-05-27*
 
-The AI Testing Agent is an intelligent testing platform that leverages open-source Large Language Models (LLMs) to automatically generate, execute, and validate tests for your codebase.
+## Project Overview
 
-## 📚 Quick Navigation
+The **Deployer DDF Mod Open LLMs** is a scalable deployment platform for open-source Large Language Models (LLMs) with automated testing and monitoring capabilities. This project follows the Dadosfera Blueprint v2.1 for enterprise-grade deployment patterns.
 
-### 🏃 Getting Started
-- [Installation Guide](setup/installation.md)
-- [Quick Start](guides/getting-started.md)
-- [Configuration](CONFIG_STRUCTURE.md)
+## Quick Start
 
-### 🤖 LLM Testing
-- [LLM Model Roadmap](#llm-model-roadmap)
-- [Local Model Testing](#local-model-testing)
-- [Advanced Testing](#advanced-testing)
-
-### 🚀 Deployment
-- [AWS Deployment](deploy/aws.md)
-- [Docker Deployment](deploy/docker.md)
-- [Local Development](guides/local-development.md)
-
-## 🤖 LLM Model Roadmap
-
-Our platform supports multiple tiers of LLM models for different testing scenarios:
-
-### 📊 **Current Models (Available)**
-| Model | Size | Type | Use Case | Status |
-|-------|------|------|----------|--------|
-| `deepseek-coder:1.3b` | 1.3B | Code | Fast iteration | ✅ Active |
-| `deepseek-coder:6.7b` | 6.7B | Code | Balanced quality | ✅ Active |
-| `llama3.2:1b` | 1B | General | Basic assistance | ✅ Active |
-| `llama-3.1-8b` | 8B | General | Advanced reasoning | 📋 Planned |
-| `codellama-34b` | 34B | Code | Expert code generation | 📋 Planned |
-
-### 🚀 **Future Models (Llama 4 Series)**
-| Model | Active Params | Total Params | Context | Specialty | Status |
-|-------|---------------|--------------|---------|-----------|--------|
-| `llama4-scout:17b` | 17B | 109B (16 experts) | 10M tokens | Multimodal | 🔬 Testing |
-| `llama4-maverick:17b` | 17B | 400B (128 experts) | 1M tokens | Creative tasks | 🔬 Testing |
-| `llama4-behemoth:288b` | 288B | ~2T (16 experts) | 1M tokens | Maximum quality | 🚧 In Training |
-
-### 🏗️ **Testing Layers**
-- **Layer 1**: Basic assistance (1B-8B models)
-- **Layer 2**: Advanced reasoning (34B-70B models)  
-- **Layer 3**: Expert analysis (reserved)
-- **Layer 4**: Enterprise strategy (288B+ models)
-
-## 🧪 Local Model Testing
-
-### **Basic Model Tests**
-Test all available local models:
+### Local Development
 ```bash
-# Activate virtual environment
-source venv/bin/activate
+# Clone and setup
+git clone <repository-url>
+cd deployer-ddf-mod-open-llms
 
-# Test all models
-python tests/test_model_basic.py --all
+# Run with default development settings
+bash run.sh --env=dev --platform=cursor --fast
 
-# Test specific model
-python tests/test_model_basic.py --model deepseek-coder:6.7b
+# Access the application
+open http://localhost:5001
+open http://localhost:5001/api-docs  # Swagger UI
 ```
 
-### **Smart Test Generation**
-Generate intelligent tests using local LLMs:
+### Production Deployment
 ```bash
-# Generate test for a React component (default model)
-python tests/local_llm_testgen.py src/components/Button.tsx
+# Deploy to AWS production
+bash run.sh --env=prd --platform=aws --full
 
-# Use higher quality model
-python tests/local_llm_testgen.py --model=quality src/components/Button.tsx
-
-# Available model tiers: fast, default, quality, context
+# Deploy to Dadosfera Orchest
+bash run.sh --env=prd --platform=dadosfera --full
 ```
 
-### **Llama 4 Maverick Testing**
-Test enterprise-level capabilities:
-```bash
-# Set HuggingFace token
-export HF_TOKEN=your_huggingface_token
+## Architecture
 
-# Run comprehensive test
-python tests/test_llama4_maverick.py --comprehensive
+### Core Components
+- **API Server**: Express.js with TypeScript (Port 5001+)
+- **LLM Integration**: Hugging Face Transformers
+- **Testing Framework**: Automated test generation and execution
+- **Monitoring**: Health checks and status endpoints
+- **Documentation**: Interactive Swagger/OpenAPI 3.0
 
-# Test specific capability
-python tests/test_llama4_maverick.py --prompt enterprise_test_generation
+### Supported Platforms
+- **Local Development**: Cursor, Replit
+- **Cloud Deployment**: AWS (ECS, ALB, S3, SQS)
+- **Data Platform**: Dadosfera Orchest
+
+## Documentation Structure
+
+### Setup & Configuration
+- [`setup/installation.md`](setup/installation.md) - Installation and dependencies
+- [`setup/configuration.md`](setup/configuration.md) - Environment configuration
+- [`setup/troubleshooting.md`](setup/troubleshooting.md) - Common issues and solutions
+
+### Deployment Guides
+- [`deploy/local-development.md`](deploy/local-development.md) - Local setup and development
+- [`deploy/aws-deployment.md`](deploy/aws-deployment.md) - AWS ECS deployment
+- [`deploy/dadosfera-deployment.md`](deploy/dadosfera-deployment.md) - Dadosfera platform deployment
+
+### Guides & References
+- [`guides/api-reference.md`](guides/api-reference.md) - API endpoints and usage
+- [`guides/aws-resources-reference.md`](guides/aws-resources-reference.md) - AWS resource documentation
+- [`guides/testing-framework.md`](guides/testing-framework.md) - Testing capabilities
+- [`guides/monitoring.md`](guides/monitoring.md) - Health checks and observability
+
+### Development
+- [`../CONTRIBUTING.md`](../CONTRIBUTING.md) - Contribution guidelines
+- [`todos/plans/`](todos/plans/) - Project roadmap and task planning
+
+## Configuration Management
+
+### Environment Files
+```
+config/
+├── dev.yml              # Development environment
+├── staging.yml          # Staging environment  
+├── prd.yml              # Production environment
+└── deployments/
+    └── may_2025/
+        ├── aws-resource-discovery.sh
+        └── discovered-resources-*.yml
 ```
 
-## 🔧 Advanced Testing
-
-### **Mutation Testing Integration**
-The platform integrates with StrykerJS for mutation testing:
-```bash
-# Run mutation testing on specific file
-npx stryker run --mutate src/components/Button.tsx
-
-# Generate tests based on mutation results
-python tests/local_llm_testgen.py --mutation-guided src/components/Button.tsx
+### Platform Configurations
+```
+config/platform-env/
+├── aws/                 # AWS-specific configs
+├── cursor/              # Cursor IDE configs
+├── dadosfera/           # Dadosfera platform configs
+├── docker/              # Docker configurations
+├── kubernetes/          # K8s manifests
+└── replit/              # Replit configurations
 ```
 
-### **Pattern Analysis**
-The system analyzes existing test patterns:
-- Extracts common testing patterns from your codebase
-- Applies learned patterns to new test generation
-- Validates generated tests against project standards
+## Run Script Interface
 
-## 📊 Test Results
+The project uses a centralized `run.sh` script following Dadosfera Blueprint standards:
 
-### **Current Test Status**
-✅ **Local Models**: All 3 models tested successfully
-- `deepseek-coder:1.3b`: 2.20s response time
-- `llama3.2:1b`: 14.56s response time  
-- `deepseek-coder:6.7b`: 18.02s response time
+### Required Flags
+- `--env=<dev|staging|prd>` - Environment configuration
+- `--platform=<cursor|replit|aws|dadosfera|docker>` - Deployment platform
 
-⚠️ **Llama 4 Maverick**: Requires HuggingFace provider setup
-🚧 **AWS Infrastructure**: CloudFormation stack not deployed
+### Optional Flags
+- `--setup` - One-time setup tasks
+- `--turbo` - Skip optional tasks (fastest)
+- `--fast` - Skip tests but run core logic
+- `--full` - Complete pipeline with tests and deployment
+- `--dry-run` - Preview changes without execution
+- `--verbose` - Detailed logging
+- `--debug` - Debug output
 
-## 🛠️ Configuration
+### Examples
+```bash
+# Development with hot reload
+bash run.sh --env=dev --platform=cursor --fast --verbose
 
-Model configurations are stored in `config/llm-models.json`:
-- Environment-specific model enablement
-- Resource requirements and limits
-- Testing layer assignments
-- Provider configurations
+# Production deployment with full pipeline
+bash run.sh --env=prd --platform=aws --full --dry-run
 
-## 🆘 Troubleshooting
+# Quick setup for new environment
+bash run.sh --env=dev --platform=cursor --setup --turbo
+```
 
-### **Common Issues**
-1. **Port 3000 in use**: Kill existing processes or use different port
-2. **Missing HF_TOKEN**: Set HuggingFace token for Llama 4 models
-3. **Ollama not running**: Start Ollama service for local models
-4. **AWS credentials**: Configure AWS CLI for cloud deployment
+## API Documentation
 
-### **Getting Help**
-- 📖 Check specific guide documentation
-- 🐛 [Report Issues](https://github.com/ddf-otsm/deployer-ddf-mod-open-llms/issues)
-- 💬 [Join Discussions](https://github.com/ddf-otsm/deployer-ddf-mod-open-llms/discussions)
+### Interactive Documentation
+- **Swagger UI**: http://localhost:5001/api-docs
+- **OpenAPI Spec**: Available at `/api-docs.json`
+
+### Core Endpoints
+- `GET /health` - Health check
+- `GET /api/status` - System status
+- `POST /api/generate-tests` - Generate LLM tests
+
+### Authentication
+- API Key authentication supported
+- Bearer token authentication for production
+
+## Monitoring & Observability
+
+### Health Checks
+- Application health: `/health`
+- System status: `/api/status`
+- Platform-specific health endpoints
+
+### Logging
+- **File Logs**: Structured JSON in `logs/`
+- **Console Logs**: stdout/stderr for CLI
+- **UI Logs**: Human-readable web interface
+
+### AWS Resources
+- CloudWatch log groups for ECS services
+- SQS queues for job processing
+- S3 buckets for result storage
+- ALB for load balancing
+
+## Development Workflow
+
+### Branch Naming Convention
+```
+{role}-{level}-{platform}-{vNo}-{objective}-{baseSHA}
+```
+
+Example: `agent-minion-cursor-1-swagger-docs-a1b2c3d`
+
+### Commit Standards
+- Format: `<scope>: <imperative description>`
+- Example: `api: add swagger documentation`
+- Example: `config: switch to port 5001 for development`
+
+### Testing
+```bash
+# Run all tests
+bash run.sh --env=dev --platform=cursor --full
+
+# Quick test run
+bash run.sh --env=dev --platform=cursor --fast
+
+# Test specific components
+npm test
+```
+
+## Troubleshooting
+
+### Common Issues
+1. **Port Conflicts**: Use ports 5001+ for macOS development
+2. **Config Loading**: Check YAML syntax in `config/*.yml`
+3. **AWS Permissions**: Verify IAM roles and policies
+4. **Dependencies**: Run `--setup` flag for fresh installations
+
+### Debug Commands
+```bash
+# Check port usage
+lsof -i :5001
+
+# Validate configuration
+bash run.sh --env=dev --platform=cursor --dry-run --debug
+
+# View logs
+tail -f logs/$(ls logs/ | tail -1)/app.log
+```
+
+## Contributing
+
+1. Follow the Dadosfera Blueprint v2.1 standards
+2. Use the centralized `run.sh` interface
+3. Update documentation for any new features
+4. Ensure all tests pass before submitting PRs
+5. Follow the branch naming convention
+
+## Support
+
+- **Documentation**: This index and linked guides
+- **API Reference**: Interactive Swagger UI
+- **Issues**: GitHub issue tracker
+- **Logs**: Check `logs/` directory for detailed information
 
 ---
 
-*Last updated: 2025-05-26* 
+*This documentation follows the Dadosfera Blueprint v2.1 standards for enterprise deployment patterns.* 

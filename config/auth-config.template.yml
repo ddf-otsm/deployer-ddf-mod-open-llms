@@ -1,5 +1,5 @@
 # Authentication Configuration Template
-# Copy this file to auth-config.yml and replace all REPLACE_WITH_* placeholders
+# Copy this file to config/auth/auth-config-deployment.yml and replace all REPLACE_WITH_* placeholders
 
 # Authentication providers configuration
 auth_providers:

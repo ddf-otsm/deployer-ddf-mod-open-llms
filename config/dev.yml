@@ -8,7 +8,7 @@ platform: "cursor"
 app:
   name: "deployer-ddf-mod-llm-models"
   version: "1.0.0"
-  port: 3000
+  port: 7001
   host: "localhost"
 
 # Authentication settings - DISABLED for development
@@ -64,7 +64,7 @@ testing:
 security:
   cors:
     enabled: true
-    origins: ["http://localhost:3000", "http://localhost:3001"]
+    origins: ["http://localhost:7001", "http://localhost:7002"]
   helmet:
     enabled: true
   rate_limiting:

@@ -1,0 +1,69 @@
+# Copy this file to secrets/deployments/docker/docker-compose-deployment.yml and customize for your environment
+# This template provides a complete development environment with Ollama and Redis
+
+version: '3.8'
+
+services:
+  deployer-ddf-mod-llm-models:
+    build:
+      context: ../..
+      dockerfile: config/docker/Dockerfile.node
+    ports:
+      - "REPLACE_WITH_API_PORT:7001"  # e.g., 7001:7001
+    environment:
+      - NODE_ENV=REPLACE_WITH_ENVIRONMENT  # e.g., development
+      - PORT=7001
+      - HOST=0.0.0.0
+      - AUTH_DISABLED=REPLACE_WITH_AUTH_SETTING  # e.g., true for dev
+      - OLLAMA_URL=http://ollama:11434
+    volumes:
+      - ../../logs:/app/logs
+      - ../../config:/app/config:ro
+    depends_on:
+      - ollama
+    networks:
+      - deployer-network
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "REPLACE_WITH_OLLAMA_PORT:11434"  # e.g., 11434:11434
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    networks:
+      - deployer-network
+
+  # Optional: Monitoring stack
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "REPLACE_WITH_PROMETHEUS_PORT:9090"  # e.g., 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - deployer-network
+    profiles:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "REPLACE_WITH_GRAFANA_PORT:3000"  # e.g., 3001:3000
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=REPLACE_WITH_GRAFANA_PASSWORD
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - deployer-network
+    profiles:
+      - monitoring
+
+volumes:
+  ollama_data:
+  grafana_data:
+
+networks:
+  deployer-network:
+    driver: bridge 

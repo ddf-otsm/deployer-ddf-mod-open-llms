@@ -1,0 +1,32 @@
+# Environment Configuration for Docker Platform - Development
+# This file is copied to .env during setup
+
+# Application Configuration
+NODE_ENV=development
+PORT=7001
+HOST=0.0.0.0
+
+# Authentication
+AUTH_DISABLED=true
+
+# Logging
+LOG_LEVEL=info
+
+# Ollama Configuration (Docker service)
+OLLAMA_HOST=ollama:11434
+
+# Redis Configuration (Docker service)
+REDIS_HOST=redis
+REDIS_PORT=6379
+
+# Development Features
+ENABLE_DEBUG=true
+ENABLE_SWAGGER=true
+
+# Docker-specific settings
+PLATFORM=docker
+ENVIRONMENT=dev
+
+# Secrets (set these environment variables)
+# export KEYCLOAK_CLIENT_SECRET="your-secret-here"
+# export AWS_ACCOUNT_ID="123456789012" 

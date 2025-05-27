@@ -1,0 +1,153 @@
+# Deployment Configuration Template
+# DeployerDDF Module: Open LLM Models
+# Date: May 26, 2025
+# Environment: ${ENVIRONMENT}
+
+metadata:
+  project: "deployer-ddf-mod-open-llms"
+  version: "1.0.0"
+  deployment_date: "${DEPLOYMENT_DATE}"
+  environment: "${ENVIRONMENT}"
+  region: "${AWS_REGION}"
+  deployed_by: "${DEPLOYED_BY}"
+
+# Infrastructure Configuration
+infrastructure:
+  vpc:
+    id: "${VPC_ID}"
+    name: "deployer-ddf-llm-vpc-${ENVIRONMENT}"
+    cidr: "10.0.0.0/16"
+    
+  subnets:
+    public:
+      - id: "${PUBLIC_SUBNET_1_ID}"
+        name: "deployer-ddf-llm-public-subnet-1-${ENVIRONMENT}"
+        cidr: "10.0.1.0/24"
+        availability_zone: "us-east-1a"
+      - id: "${PUBLIC_SUBNET_2_ID}"
+        name: "deployer-ddf-llm-public-subnet-2-${ENVIRONMENT}"
+        cidr: "10.0.2.0/24"
+        availability_zone: "us-east-1b"
+    private:
+      - id: "${PRIVATE_SUBNET_1_ID}"
+        name: "deployer-ddf-llm-private-subnet-1-${ENVIRONMENT}"
+        cidr: "10.0.3.0/24"
+        availability_zone: "us-east-1a"
+      - id: "${PRIVATE_SUBNET_2_ID}"
+        name: "deployer-ddf-llm-private-subnet-2-${ENVIRONMENT}"
+        cidr: "10.0.4.0/24"
+        availability_zone: "us-east-1b"
+
+  security_groups:
+    alb:
+      id: "${ALB_SECURITY_GROUP_ID}"
+      name: "deployer-ddf-llm-alb-sg-${ENVIRONMENT}"
+      description: "Security group for Application Load Balancer"
+    ecs:
+      id: "${ECS_SECURITY_GROUP_ID}"
+      name: "deployer-ddf-llm-ecs-sg-${ENVIRONMENT}"
+      description: "Security group for ECS tasks"
+
+  load_balancer:
+    arn: "${ALB_ARN}"
+    name: "deployer-ddf-llm-alb-${ENVIRONMENT}"
+    dns_name: "${ALB_DNS_NAME}"
+    hosted_zone_id: "${ALB_HOSTED_ZONE_ID}"
+    target_group:
+      arn: "${TARGET_GROUP_ARN}"
+      name: "deployer-ddf-llm-tg-${ENVIRONMENT}"
+
+# Compute Configuration
+compute:
+  ecs:
+    cluster:
+      arn: "${ECS_CLUSTER_ARN}"
+      name: "deployer-ddf-llm-cluster-${ENVIRONMENT}"
+    service:
+      arn: "${ECS_SERVICE_ARN}"
+      name: "deployer-ddf-llm-service-${ENVIRONMENT}"
+    task_definition:
+      arn: "${TASK_DEFINITION_ARN}"
+      family: "deployer-ddf-llm-task-${ENVIRONMENT}"
+      revision: "${TASK_DEFINITION_REVISION}"
+
+  iam:
+    execution_role:
+      arn: "${EXECUTION_ROLE_ARN}"
+      name: "deployer-ddf-llm-execution-role-${ENVIRONMENT}"
+    task_role:
+      arn: "${TASK_ROLE_ARN}"
+      name: "deployer-ddf-llm-task-role-${ENVIRONMENT}"
+
+# Storage Configuration
+storage:
+  s3:
+    results_bucket:
+      name: "${S3_BUCKET_NAME}"
+      arn: "${S3_BUCKET_ARN}"
+      region: "${AWS_REGION}"
+      versioning: true
+      encryption: "AES256"
+
+  sqs:
+    main_queue:
+      url: "${SQS_MAIN_QUEUE_URL}"
+      arn: "${SQS_MAIN_QUEUE_ARN}"
+      name: "deployer-ddf-llm-test-jobs-${ENVIRONMENT}"
+    dlq:
+      url: "${SQS_DLQ_URL}"
+      arn: "${SQS_DLQ_ARN}"
+      name: "deployer-ddf-llm-test-jobs-dlq-${ENVIRONMENT}"
+
+# Monitoring Configuration
+monitoring:
+  cloudwatch:
+    log_group:
+      name: "/aws/ecs/deployer-ddf-llm-${ENVIRONMENT}"
+      arn: "${CLOUDWATCH_LOG_GROUP_ARN}"
+      retention_days: 30
+
+# Application Configuration
+application:
+  container:
+    image: "${CONTAINER_IMAGE}"
+    port: 5001
+    cpu: 256
+    memory: 512
+    environment_variables:
+      NODE_ENV: "${ENVIRONMENT}"
+      PORT: "5001"
+      HOST: "0.0.0.0"
+      AWS_REGION: "${AWS_REGION}"
+
+# CloudFormation Stack Information
+cloudformation:
+  stack_name: "${CLOUDFORMATION_STACK_NAME}"
+  stack_id: "${CLOUDFORMATION_STACK_ID}"
+  stack_status: "${CLOUDFORMATION_STACK_STATUS}"
+  outputs:
+    vpc_id: "${VPC_ID}"
+    public_subnets: "${PUBLIC_SUBNETS}"
+    private_subnets: "${PRIVATE_SUBNETS}"
+    ecs_cluster: "${ECS_CLUSTER_ARN}"
+    alb_dns: "${ALB_DNS_NAME}"
+    s3_bucket: "${S3_BUCKET_NAME}"
+    test_queue: "${SQS_MAIN_QUEUE_URL}"
+
+# Deployment Notes
+notes:
+  - "This configuration was generated from the CloudFormation template"
+  - "Replace all ${VARIABLE} placeholders with actual values"
+  - "Use the aws-resource-discovery.sh script to populate actual values"
+  - "Store sensitive values in environment variables or AWS Secrets Manager"
+  - "Update this file after any infrastructure changes"
+
+# Tags Applied to All Resources
+tags:
+  Project: "deployer-ddf-mod-open-llms"
+  Environment: "${ENVIRONMENT}"
+  Component: "ai-testing-agent"
+  ManagedBy: "CloudFormation"
+  CostCenter: "AI-Testing-Agent"
+  Owner: "${DEPLOYED_BY}"
+  CreatedDate: "${DEPLOYMENT_DATE}" 

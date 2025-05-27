@@ -91,13 +91,10 @@ check_git_status() {
     
     # Check if any sensitive files are tracked
     local sensitive_files=(
-        "aws-dev-account.yml"
-        "auth-config.yml"
-        "keycloak-integration.yml"
-        "api-tokens/"
-        "aws-credentials/"
         "secrets/"
         ".env"
+        "*.secret"
+        "*.secrets"
     )
     
     for file in "${sensitive_files[@]}"; do
@@ -107,6 +104,41 @@ check_git_status() {
             log_success "Sensitive file is not tracked by git: $file"
         fi
     done
+}
+
+# Check secrets directory structure
+check_secrets_structure() {
+    log_info "Checking secrets directory structure..."
+    
+    if [[ -d "secrets" ]]; then
+        log_success "Secrets directory exists"
+        
+        # Check if secrets directory is properly ignored
+        if git check-ignore secrets >/dev/null 2>&1; then
+            log_success "Secrets directory is properly git-ignored"
+        else
+            log_error "Secrets directory is NOT git-ignored"
+        fi
+        
+        # Check for deployment files in secrets
+        local deployment_files=(
+            "secrets/deployments/aws/aws-dev-account-deployment.yml"
+            "secrets/deployments/auth/auth-config-deployment.yml"
+            "secrets/deployments/auth/keycloak-integration-deployment.yml"
+            "secrets/deployments/docker/docker-compose-deployment.yml"
+        )
+        
+        for file in "${deployment_files[@]}"; do
+            if [[ -f "$file" ]]; then
+                log_success "Deployment file exists: $file"
+                check_placeholders "$file" "$(basename "$file")"
+            else
+                log_warning "Deployment file missing: $file"
+            fi
+        done
+    else
+        log_warning "Secrets directory does not exist - run setup first"
+    fi
 }
 
 # Check AWS CLI configuration
@@ -174,6 +206,16 @@ check_nodejs_config() {
 check_file_permissions() {
     log_info "Checking file permissions..."
     
+    # Check secrets directory permissions
+    if [[ -d "secrets" ]]; then
+        local perms=$(stat -c "%a" "secrets" 2>/dev/null || stat -f "%A" "secrets" 2>/dev/null || echo "unknown")
+        if [[ "$perms" == "700" ]] || [[ "$perms" == "750" ]]; then
+            log_success "Secrets directory has secure permissions ($perms)"
+        else
+            log_warning "Secrets directory has loose permissions ($perms)"
+        fi
+    fi
+    
     # Check API token files
     if [[ -d "api-tokens/dev" ]]; then
         for file in api-tokens/dev/*; do
@@ -199,49 +241,47 @@ main() {
     log_info "Starting security verification..."
     echo
     
-    # Check configuration files
-    log_info "Checking configuration files..."
-    check_file_exists "config/aws-dev-account.template.yml" "AWS dev account template"
-    check_file_exists "config/auth-config.template.yml" "Auth config template"
+    # Check configuration templates
+    log_info "Checking configuration templates..."
+    check_file_exists "config/aws-dev-account.template.yml" "AWS dev account template" || true
+    check_file_exists "config/auth-config.template.yml" "Auth config template" || true
+    check_file_exists "config/auth/keycloak-integration.template.yml" "Keycloak integration template" || true
+    check_file_exists "config/docker/docker-compose.template.yml" "Docker Compose template" || true
+    echo
     
-    if check_file_exists "aws-dev-account.yml" "AWS dev account config"; then
-        check_placeholders "aws-dev-account.yml" "AWS dev account config"
-    fi
-    
-    if check_file_exists "auth-config.yml" "Auth config"; then
-        check_placeholders "auth-config.yml" "Auth config"
-    fi
+    # Check secrets directory structure
+    check_secrets_structure || true
     echo
     
     # Check directory security
     log_info "Checking directory security..."
-    check_directory_security "api-tokens" "API tokens directory"
-    check_directory_security "aws-credentials" "AWS credentials directory"
-    check_directory_security "secrets" "Secrets directory"
+    check_directory_security "secrets" "Secrets directory" || true
+    check_directory_security "api-tokens" "API tokens directory" || true
+    check_directory_security "aws-credentials" "AWS credentials directory" || true
     echo
     
     # Check file permissions
-    check_file_permissions
+    check_file_permissions || true
     echo
     
     # Check git status
-    check_git_status
+    check_git_status || true
     echo
     
     # Check system dependencies
-    check_aws_config
+    check_aws_config || true
     echo
-    check_docker_config
+    check_docker_config || true
     echo
-    check_nodejs_config
+    check_nodejs_config || true
     echo
     
     # Check .gitignore
     log_info "Checking .gitignore configuration..."
-    if grep -q "config/\*.yml" .gitignore 2>/dev/null; then
-        log_success ".gitignore excludes config YAML files"
+    if grep -q "secrets/" .gitignore 2>/dev/null; then
+        log_success ".gitignore excludes secrets directory"
     else
-        log_warning ".gitignore may not exclude config YAML files"
+        log_error ".gitignore does not exclude secrets directory"
     fi
     
     if grep -q "api-tokens/" .gitignore 2>/dev/null; then
@@ -264,6 +304,9 @@ main() {
     if [[ $ERRORS -gt 0 ]]; then
         echo -e "${RED}❌ Security check failed with $ERRORS errors${NC}"
         echo "Please fix the errors before proceeding with deployment."
+        echo
+        echo "To set up secrets properly:"
+        echo "  bash workflow_tasks/run.sh --env=dev --platform=cursor --setup"
         exit 1
     elif [[ $WARNINGS -gt 0 ]]; then
         echo -e "${YELLOW}⚠️  Security check completed with $WARNINGS warnings${NC}"

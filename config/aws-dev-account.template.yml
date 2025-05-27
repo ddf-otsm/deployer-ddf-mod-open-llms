@@ -1,5 +1,5 @@
 # AWS DEV Account Configuration Template
-# Copy this file to aws-dev-account.yml and replace all REPLACE_WITH_* placeholders
+# Copy this file to config/deployments/aws/aws-dev-account-deployment.yml and replace all REPLACE_WITH_* placeholders
 
 aws_account:
   type: "development"

@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 class KeycloakAuth:
     """Keycloak authentication integration for AI Testing Agent"""
     
-    def __init__(self, config_path: str = "/app/config/keycloak-integration.yml"):
+    def __init__(self, config_path: str = "/app/config/auth/keycloak-integration-deployment.yml"):
         self.config = self._load_config(config_path)
         self.keycloak_config = self.config['keycloak']
         self.token_cache = {}  # Cache for validated tokens

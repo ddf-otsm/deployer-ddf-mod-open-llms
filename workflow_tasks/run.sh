@@ -45,7 +45,7 @@ SPEED MODES (mutually exclusive, default: --full):
   --full               Full suite: all validations and tests
 
 PLATFORM & ENVIRONMENT:
-  -p, --platform=<p>   Platform: replit|dadosfera|docker|kubernetes|cursor (default: replit)
+  -p, --platform=<p>   Platform: replit|dadosfera|docker|kubernetes|cursor|aws (default: replit)
   -e, --env=<env>      Environment: dev|stg|hmg|prd (default: dev)
 
 OPERATION FLAGS:
@@ -148,9 +148,9 @@ done
 
 # Validate platform
 case $PLATFORM in
-    replit|dadosfera|docker|kubernetes|cursor) ;;
+    replit|dadosfera|docker|kubernetes|cursor|aws) ;;
     *)
-        log_error "Invalid platform: $PLATFORM. Must be one of: replit, dadosfera, docker, kubernetes, cursor"
+        log_error "Invalid platform: $PLATFORM. Must be one of: replit, dadosfera, docker, kubernetes, cursor, aws"
         exit 1
         ;;
 esac
@@ -210,7 +210,52 @@ setup_workflow() {
     # 1. Ensure shadow_symlinks directory exists
     run_cmd "mkdir -p '$PROJECT_ROOT/workflow_tasks/shadow_symlinks'"
     
-    # 2. Create .env from template
+    # 2. Setup secrets directory structure
+    log_info "Setting up secrets management..." "run.sh"
+    if [[ ! -d "$PROJECT_ROOT/secrets" ]]; then
+        log_info "Creating secrets directory structure..." "run.sh"
+        run_cmd "mkdir -p '$PROJECT_ROOT/secrets/deployments/aws'"
+        run_cmd "mkdir -p '$PROJECT_ROOT/secrets/deployments/auth'"
+        run_cmd "mkdir -p '$PROJECT_ROOT/secrets/deployments/docker'"
+        
+        # Set secure permissions
+        run_cmd "chmod 700 '$PROJECT_ROOT/secrets'"
+        log_success "Secrets directory created with secure permissions" "run.sh"
+        
+        # Copy template files to secrets directory
+        local templates=(
+            "config/aws-dev-account.template.yml:secrets/deployments/aws/aws-dev-account-deployment.yml"
+            "config/auth-config.template.yml:secrets/deployments/auth/auth-config-deployment.yml"
+            "config/auth/keycloak-integration.template.yml:secrets/deployments/auth/keycloak-integration-deployment.yml"
+            "config/docker/docker-compose.template.yml:secrets/deployments/docker/docker-compose-deployment.yml"
+        )
+        
+        for template_mapping in "${templates[@]}"; do
+            local template_file="${template_mapping%%:*}"
+            local deployment_file="${template_mapping##*:}"
+            
+            if [[ -f "$PROJECT_ROOT/$template_file" ]]; then
+                run_cmd "cp '$PROJECT_ROOT/$template_file' '$PROJECT_ROOT/$deployment_file'"
+                run_cmd "chmod 600 '$PROJECT_ROOT/$deployment_file'"
+                log_success "Created: $deployment_file" "run.sh"
+            else
+                log_warn "Template file not found: $template_file" "run.sh"
+                WARNINGS+=("Missing template: $template_file")
+            fi
+        done
+        
+        log_success "Secrets management setup completed" "run.sh"
+    else
+        log_info "Secrets directory already exists" "run.sh"
+    fi
+    
+    # 3. Port cleanup and verification
+    if [[ -f "$PROJECT_ROOT/scripts/port-manager.sh" ]]; then
+        log_info "Checking and cleaning up ports..." "run.sh"
+        run_cmd "bash '$PROJECT_ROOT/scripts/port-manager.sh' cleanup"
+    fi
+    
+    # 4. Create .env from template
     local template_file="$PROJECT_ROOT/config/platform-env/$PLATFORM/$ENV.template"
     local env_file="$PROJECT_ROOT/.env"
     
@@ -223,21 +268,40 @@ setup_workflow() {
         WARNINGS+=("Missing .env template for $PLATFORM/$ENV")
     fi
     
-    # 3. Setup Git hooks if requested
+    # 5. Setup Git hooks if requested
     if [[ "$SETUP_HOOKS" == "true" ]]; then
         log_info "Installing Git hooks non-interactively" "run.sh"
         # TODO: Implement Git hooks installation
         log_info "Git hooks installation completed" "run.sh"
     fi
     
-    # 4. Print setup summary
+    # 6. Print setup summary and next steps
     log_success "Setup workflow completed" "run.sh"
     echo
     echo "Setup Summary:"
     echo "=============="
+    echo "• Secrets directory: $([ -d "$PROJECT_ROOT/secrets" ] && echo "✓ Created" || echo "✗ Missing")"
     echo "• .env file: $([ -f "$env_file" ] && echo "✓ Created" || echo "✗ Missing")"
     echo "• Template used: $template_file"
     echo "• Git hooks: $([ "$SETUP_HOOKS" == "true" ] && echo "✓ Installed" || echo "- Skipped")"
+    echo
+    echo "Next Steps:"
+    echo "==========="
+    echo "1. Edit deployment files in secrets/deployments/ and replace placeholders:"
+    echo "   - REPLACE_WITH_ACTUAL_DEV_ACCOUNT_ID → Your AWS account ID"
+    echo "   - Email addresses → Your actual contact emails"
+    echo
+    echo "2. Set environment variables for sensitive values:"
+    echo "   export KEYCLOAK_CLIENT_SECRET=\"your-secret-here\""
+    echo "   export AWS_ACCOUNT_ID=\"123456789012\""
+    echo
+    echo "3. Verify your setup:"
+    echo "   bash tests/security-check.sh"
+    echo
+    echo "4. Run the application:"
+    echo "   bash workflow_tasks/run.sh --env=$ENV --platform=$PLATFORM --fast"
+    echo
+    echo "⚠️  IMPORTANT: Never commit files from the secrets/ directory!"
     echo
     
     exit 0
@@ -306,13 +370,24 @@ kill_stale_services() {
     
     log_step "Killing stale services" "run.sh"
     
-    if [[ "$SPEED_MODE" == "fast" ]]; then
-        # Quick kill of common ports
-        kill_common_ports
+    # Use port manager if available
+    if [[ -f "$PROJECT_ROOT/scripts/port-manager.sh" ]]; then
+        log_info "Using port manager for service cleanup" "run.sh"
+        if [[ "$SPEED_MODE" == "fast" ]]; then
+            run_cmd "bash '$PROJECT_ROOT/scripts/port-manager.sh' cleanup"
+        else
+            run_cmd "bash '$PROJECT_ROOT/scripts/port-manager.sh' kill-all"
+        fi
     else
-        # Full port cleanup
-        local ports_to_kill=(3000 3001 8000 8080 9000 9090)
-        kill_ports "${ports_to_kill[@]}" || handle_error "kill_stale_services" "Failed to kill some processes"
+        # Fallback to legacy method
+        if [[ "$SPEED_MODE" == "fast" ]]; then
+            # Quick kill of common ports
+            kill_common_ports
+        else
+            # Full port cleanup
+            local ports_to_kill=(5001 3000 3001 8000 8080 9000 9090)
+            kill_ports "${ports_to_kill[@]}" || handle_error "kill_stale_services" "Failed to kill some processes"
+        fi
     fi
 }
 
@@ -324,19 +399,51 @@ port_verification() {
     
     log_step "Port verification" "run.sh"
     
-    local preferred_port=3000
-    local actual_port
-    
-    if [[ "$SPEED_MODE" == "fast" ]]; then
-        # Lenient mode - just find any available port
-        actual_port=$(find_available_port "$preferred_port" 2>/dev/null) || handle_error "port_verification" "No available ports found"
+    # Use port manager if available
+    if [[ -f "$PROJECT_ROOT/scripts/port-manager.sh" ]]; then
+        log_info "Using port manager for port verification" "run.sh"
+        run_cmd "bash '$PROJECT_ROOT/scripts/port-manager.sh' check" || {
+            log_warn "Some ports are in use. Cleaning up..." "run.sh"
+            run_cmd "bash '$PROJECT_ROOT/scripts/port-manager.sh' kill-all"
+        }
+        
+        # Get preferred port from port config
+        local preferred_port=7001  # Default from config/ports.yml
+        if [[ -f "$PROJECT_ROOT/config/ports.yml" ]]; then
+            local config_port=$(grep -A5 "development:" "$PROJECT_ROOT/config/ports.yml" | grep "api_port:" | sed 's/.*api_port:\s*//' | head -1)
+            if [[ -n "$config_port" ]]; then
+                preferred_port="$config_port"
+                log_info "Using port from port config: $preferred_port" "run.sh"
+            fi
+        fi
+        
+        export APP_PORT="$preferred_port"
+        log_success "Application will use port: $preferred_port" "run.sh"
     else
-        # Strict mode - try to use preferred port
-        actual_port=$(setup_port_fallback "$preferred_port" "deployer-ddf-mod-open-llms" 2>/dev/null) || handle_error "port_verification" "Port setup failed"
+        # Fallback to legacy method
+        # Try to read port from config file
+        local preferred_port=5001  # Default for macOS development
+        if [[ -f "$CONFIG_FILE" ]]; then
+            local config_port=$(grep -E "^\s*port:\s*[0-9]+" "$CONFIG_FILE" | sed 's/.*port:\s*//' | head -1)
+            if [[ -n "$config_port" ]]; then
+                preferred_port="$config_port"
+                log_info "Using port from config: $preferred_port" "run.sh"
+            fi
+        fi
+        
+        local actual_port
+        
+        if [[ "$SPEED_MODE" == "fast" ]]; then
+            # Lenient mode - just find any available port
+            actual_port=$(find_available_port "$preferred_port" 2>/dev/null) || handle_error "port_verification" "No available ports found"
+        else
+            # Strict mode - try to use preferred port
+            actual_port=$(setup_port_fallback "$preferred_port" "deployer-ddf-mod-open-llms" 2>/dev/null) || handle_error "port_verification" "Port setup failed"
+        fi
+        
+        export APP_PORT="$actual_port"
+        log_success "Application will use port: $actual_port" "run.sh"
     fi
-    
-    export APP_PORT="$actual_port"
-    log_success "Application will use port: $actual_port" "run.sh"
 }
 
 # Dependency installation and deduplication
@@ -455,7 +562,7 @@ launch_application() {
     
     # Set environment variables
     export NODE_ENV="$ENV"
-    export PORT="${APP_PORT:-3000}"
+    export PORT="${APP_PORT:-5001}"
     
     case $PLATFORM in
         cursor|replit)
@@ -467,7 +574,7 @@ launch_application() {
             ;;
         docker)
             log_info "Starting with Docker Compose" "run.sh"
-            run_cmd "cd '$PROJECT_ROOT' && docker-compose up -d"
+            run_cmd "cd '$PROJECT_ROOT' && docker-compose -f secrets/deployments/docker/docker-compose-deployment.yml up -d"
             ;;
         *)
             log_info "Starting application for platform: $PLATFORM" "run.sh"
@@ -560,7 +667,7 @@ main() {
     
     # Post-launch summary
     log_success "Application launched successfully" "run.sh"
-    log_info "Service should be available at: http://localhost:${APP_PORT:-3000}" "run.sh"
+    log_info "Service should be available at: http://localhost:${APP_PORT:-5001}" "run.sh"
     
     # Generate final summary
     generate_summary
