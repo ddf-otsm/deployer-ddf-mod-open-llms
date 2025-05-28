@@ -1,0 +1,9 @@
+models:
+  - name: deepseek-coder:1.3b
+    provider: ollama
+  - name: deepseek-coder:6.7b
+    provider: ollama
+  - name: custom-model:1.0
+    provider: custom
+    endpoint: "https://your-custom-model-endpoint.com/api" # Replace with actual endpoint
+    api_key: "YOUR_CUSTOM_API_KEY" # Replace with actual API key 
